@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-//#include <string.h>
-
-//-p /home/pum/Bork/Projects/Tram/v2021/prog2.trm -O -t /home/pum/Bork/Projects/Tram/v2021/term2a.trm -o -r
 
 #define error(...) \
     fprintf( stdout, "***ERROR***\n"); \
