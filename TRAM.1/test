@@ -1,0 +1,165 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+    printf "Usage: %s <application>\n" "$0" >&2
+    exit 1
+fi
+bin="./$1"           # The application (from command arg)
+diff="diff -iad"   # Diff command, or what ever
+
+function test () {
+	echo -n $2  '[' $bin -P "prog$1.trm" -T "term$1.trm" -r -O ']' "=>  "
+	$bin -P "prog$1.trm" -T "term$1.trm" -r -O  > "out$1"
+	$diff "out$1" "expect$1"
+	e_code=$?
+    if [ $e_code != 0 ]; then
+            printf "TEST $1 FAIL : %d\n" "$e_code"
+    else
+            printf "TEST $1 OK!\n"
+    fi
+}
+function testx () {
+	echo -n $2 '[' $bin $(echo "$3" "$4" "$5" "$6" "$7") ']' "=>  "
+	$bin $(echo "$3" "$4" "$5" "$6" "$7") > "out$1"
+	$diff "out$1" "expect$1"
+	e_code=$?
+    if [ $e_code != 0 ]; then
+            printf "TEST $1 FAIL : %d\n" "$e_code"
+    else
+            printf "TEST $1 OK!\n"
+    fi
+}
+
+#-P /home/pum/Bork/Projects/Tram/v2021/prog0.trm -T /home/pum/Bork/Projects/Tram/v2021/term0.trm -i -r -O
+Test=0
+Doc="Most simple test"
+cat <<-'******************' > "prog$Test.trm"
+	a=b;
+******************
+cat <<-'******************' > "term$Test.trm"
+	f(a,#100)
+******************
+cat <<-'******************' > "expect$Test"
+	f(b,#0x64)
+******************
+test "$Test" "$Doc"
+
+Test=10
+Doc="Check data scanner and printer"
+cat <<-'******************' > "prog$Test.trm"
+	a=b;
+******************
+cat <<-'******************' > "term$Test.trm"
+	!comment
+	test(eos,str,eol,lst,#12345,#0xDedBef,'A,#-1,*A,$A1,antroposofie,Xantippe,Y,a)
+******************
+cat <<-'******************' > "expect$Test"
+	test(eos,str,eol,lst,#0x3039,#0xdedbef,#0x41,#0x3fffffff,*A,$A1,antro...,Xant...,Y,b)
+******************
+test "$Test" "$Doc"
+
+
+Test=20
+Doc="Check rewriter"
+cat <<-'******************' > "prog$Test.trm"
+	p(s(X),Y) = s(p(X,Y));
+	p(z,X) = X;
+	t(s(X),Y) = p(t(X,Y),Y);
+	t(z,X) = z;
+******************
+cat <<-'******************' > "term$Test.trm"
+	t(s(s(s(s(s(s(t(s(s(s(s(s(s(z)))))),s(s(s(s(s(z)))))))))))),s(s(s(s(s(t(s(s(s(s(s(s(z)))))),s(s(s(s(s(z))))))))))))
+******************
+cat <<-'******************' > "expect$Test"
+	s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(z))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+******************
+test "$Test" "$Doc"
+
+
+Test=30
+F1="-p prog1$Test.trm -p prog2$Test.trm -C -I -T term$Test.trm -r -O"
+Doc="Check combine sources"
+cat <<-'******************' > "prog1$Test.trm"
+	a(s(X),p(Y)) = a(X,Y);
+	a(s(X),Y) = s(a(X,Y));
+******************
+cat <<-'******************' > "prog2$Test.trm"
+	a(X,p(Y)) = p(a(X,Y));
+	a(z,X) = X;
+	a(X,Y) = a(Y,X);
+******************
+cat <<-'******************' > "term$Test.trm"
+	a(p(p(p(z))),s(s(s(s(s(z))))))
+******************
+cat <<-'******************' > "expect$Test"
+	a(s(X),p(Y)) = a(X,Y);
+	a(s(X),Y) = s(a(X,Y));
+	a(X,p(Y)) = p(a(X,Y));
+	a(z,X) = X;
+	a(X,Y) = a(Y,X);
+
+
+	s(s(z))
+******************
+testx "$Test" "$Doc" "$F1" "$F2" "$F3" "$F4" "$F5"
+
+
+Test=40
+F1="-P prog$Test.trm -I -t term2$Test.trm -t term3$Test.trm -M term1$Test.trm -i -r -O"
+Doc="Check combine terms with template"
+cat <<-'******************' > "prog$Test.trm"
+	a(s(X),p(Y)) = a(X,Y);
+	a(s(X),Y) = s(a(X,Y));
+	a(X,p(Y)) = p(a(X,Y));
+	a(z,X) = X;
+	a(X,Y) = a(Y,X);
+******************
+cat <<-'******************' > "term1$Test.trm"
+	a(p(%1),s(s(s(%2))))
+******************
+cat <<-'******************' > "term2$Test.trm"
+	p(p(z))
+******************
+cat <<-'******************' > "term3$Test.trm"
+	s(s(z))
+******************
+cat <<-'******************' > "expect$Test"
+	a(s(X),p(Y)) = a(X,Y);
+	a(s(X),Y) = s(a(X,Y));
+	a(X,p(Y)) = p(a(X,Y));
+	a(z,X) = X;
+	a(X,Y) = a(Y,X);
+	
+	
+	a(p(p(p(z))),s(s(s(s(s(z))))))
+	s(s(z))
+******************
+testx "$Test" "$Doc" "$F1" "$F2" "$F3" "$F4" "$F5"
+
+#-P /home/pum/Bork/Projects/Tram/v2021/prog50.trm -s /home/pum/Bork/Projects/Tram/v2021/term250.trm -M /home/pum/Bork/Projects/Tram/v2021/term150.trm -r -O
+Test=50
+F1="-P prog$Test.trm -I -s term2$Test.trm -M term1$Test.trm -i -r -O"
+Doc="Check combine sources"
+cat <<-'******************' > "prog$Test.trm"
+	rev(S) = revx(S,eos);
+	revx(eos,S) = S;
+	revx(str(C,S),T) = revx(S,str(C,T));
+******************
+cat <<-'******************' > "term1$Test.trm"
+	rev(%1)
+******************
+cat <<-'******************' > "term2$Test.trm"
+	xyz
+******************
+truncate -s -1 "term2$Test.trm"
+cat <<-'******************' > "expect$Test"
+	rev(S) = revx(S,eos);
+	revx(eos,S) = S;
+	revx(str(C,S),T) = revx(S,str(C,T));
+
+
+	rev(str(#0x7a,str(#0x79,str(#0x78,eos))))
+	str(#0x78,str(#0x79,str(#0x7a,eos)))
+******************
+testx "$Test" "$Doc" "$F1" "$F2" "$F3" "$F4" "$F5"
+
