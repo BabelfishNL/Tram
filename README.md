@@ -8,10 +8,8 @@ Tram supports left-linear unconditional term rewriting systems. TRAM is created 
 [[Walters & Kamperman, 1996]](https://www.beginnings.blog/references/)
 [[Fokkink et al., 1998]](https://www.beginnings.blog/references/)
 
-One reason to make TRAM light-weight is the underlying goal to implement TRAM directly on FPGA hardware.
-
 ## Design Criteria
-In  [Section Term Rewriting](https://www.beginnings.blog/trs/termrewriting/) we discussed criteria which make term rewriting a suitable basis for general programming and specification. Term rewriting systems offer a minimalistic, powerful, unopinionated framework for the design, specification and implementation of software:
+In  [Blog Section Term Rewriting](https://www.beginnings.blog/trs/termrewriting/) we discussed criteria which make term rewriting a suitable basis for general programming and specification. Term rewriting systems offer a minimalistic, powerful, unopinionated framework for the design, specification and implementation of software:
 
 * Unopinionated  
 There are no built-in numbers, strings, arrays, objects, etcetera. This is bad if you want a flying start; use Python in this case. It is good if you want to be precise, and use TRS's both as a specification and an implementation language.
