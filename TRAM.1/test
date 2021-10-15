@@ -9,8 +9,8 @@ diff="diff -iad"   # Diff command, or what ever
 
 function test () {
 	echo -n $2  '[' $bin -P "prog$1.trm" -T "term$1.trm" -r -O ']' "=>  "
-	$bin -P "prog$1.trm" -T "term$1.trm" -r -O  > "out$1"
-	$diff "out$1" "expect$1"
+	$bin -P "prog$1.trm" -T "term$1.trm" -r -O  > "out$1.out"
+	$diff "out$1.out" "expect$1.out"
 	e_code=$?
     if [ $e_code != 0 ]; then
             printf "TEST $1 FAIL : %d\n" "$e_code"
@@ -19,9 +19,9 @@ function test () {
     fi
 }
 function testx () {
-	echo -n $2 '[' $bin $(echo "$3" "$4" "$5" "$6" "$7") ']' "=>  "
-	$bin $(echo "$3" "$4" "$5" "$6" "$7") > "out$1"
-	$diff "out$1" "expect$1"
+	echo -n $2 '[' $bin $(echo "$3") ']' "=>  "
+	$bin $(echo "$3") > "out$1.out"
+	$diff "out$1.out" "expect$1.out"
 	e_code=$?
     if [ $e_code != 0 ]; then
             printf "TEST $1 FAIL : %d\n" "$e_code"
@@ -39,7 +39,7 @@ cat <<-'******************' > "prog$Test.trm"
 cat <<-'******************' > "term$Test.trm"
 	f(a,#100)
 ******************
-cat <<-'******************' > "expect$Test"
+cat <<-'******************' > "expect$Test.out"
 	f(b,#0x64)
 ******************
 test "$Test" "$Doc"
@@ -51,13 +51,12 @@ cat <<-'******************' > "prog$Test.trm"
 ******************
 cat <<-'******************' > "term$Test.trm"
 	!comment
-	test(eos,str,eol,lst,#12345,#0xDedBef,'A,#-1,*A,$A1,antroposofie,Xantippe,Y,a)
+	test(eos,str('a',eos),eol,lst('a',eol),#12345,#0,#1,#007,#0xDedBef,'A',#-1,*A,$A1,antroposofie,Xantippe,Y,a)
 ******************
-cat <<-'******************' > "expect$Test"
-	test(eos,str,eol,lst,#0x3039,#0xdedbef,#0x41,#0x3fffffff,*A,$A1,antro...,Xant...,Y,b)
+cat <<-'******************' > "expect$Test.out"
+	test(eos,str(#0x61,eos),eol,lst(#0x61,eol),#0x3039,#0x0,#0x1,#0x7,#0xdedbef,#0x41,#0x3fffffff,*A,$A1,antro...,Xant...,Y,b)
 ******************
 test "$Test" "$Doc"
-
 
 Test=20
 Doc="Check rewriter"
@@ -70,14 +69,14 @@ cat <<-'******************' > "prog$Test.trm"
 cat <<-'******************' > "term$Test.trm"
 	t(s(s(s(s(s(s(t(s(s(s(s(s(s(z)))))),s(s(s(s(s(z)))))))))))),s(s(s(s(s(t(s(s(s(s(s(s(z)))))),s(s(s(s(s(z))))))))))))
 ******************
-cat <<-'******************' > "expect$Test"
+cat <<-'******************' > "expect$Test.out"
 	s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(s(z))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 ******************
 test "$Test" "$Doc"
 
 
 Test=30
-F1="-p prog1$Test.trm -p prog2$Test.trm -C -I -T term$Test.trm -r -O"
+Flags="-p prog1$Test.trm -p prog2$Test.trm -C -I -T term$Test.trm -r -O"
 Doc="Check combine sources"
 cat <<-'******************' > "prog1$Test.trm"
 	a(s(X),p(Y)) = a(X,Y);
@@ -91,7 +90,7 @@ cat <<-'******************' > "prog2$Test.trm"
 cat <<-'******************' > "term$Test.trm"
 	a(p(p(p(z))),s(s(s(s(s(z))))))
 ******************
-cat <<-'******************' > "expect$Test"
+cat <<-'******************' > "expect$Test.out"
 	a(s(X),p(Y)) = a(X,Y);
 	a(s(X),Y) = s(a(X,Y));
 	a(X,p(Y)) = p(a(X,Y));
@@ -101,11 +100,11 @@ cat <<-'******************' > "expect$Test"
 
 	s(s(z))
 ******************
-testx "$Test" "$Doc" "$F1" "$F2" "$F3" "$F4" "$F5"
+testx "$Test" "$Doc" "$Flags"
 
 
 Test=40
-F1="-P prog$Test.trm -I -t term2$Test.trm -t term3$Test.trm -M term1$Test.trm -i -r -O"
+Flags="-P prog$Test.trm -I -t term2$Test.trm -t term3$Test.trm -M term1$Test.trm -i -r -O"
 Doc="Check combine terms with template"
 cat <<-'******************' > "prog$Test.trm"
 	a(s(X),p(Y)) = a(X,Y);
@@ -123,7 +122,7 @@ cat <<-'******************' > "term2$Test.trm"
 cat <<-'******************' > "term3$Test.trm"
 	s(s(z))
 ******************
-cat <<-'******************' > "expect$Test"
+cat <<-'******************' > "expect$Test.out"
 	a(s(X),p(Y)) = a(X,Y);
 	a(s(X),Y) = s(a(X,Y));
 	a(X,p(Y)) = p(a(X,Y));
@@ -134,11 +133,11 @@ cat <<-'******************' > "expect$Test"
 	a(p(p(p(z))),s(s(s(s(s(z))))))
 	s(s(z))
 ******************
-testx "$Test" "$Doc" "$F1" "$F2" "$F3" "$F4" "$F5"
+testx "$Test" "$Doc" "$Flags"
 
 #-P /home/pum/Bork/Projects/Tram/v2021/prog50.trm -s /home/pum/Bork/Projects/Tram/v2021/term250.trm -M /home/pum/Bork/Projects/Tram/v2021/term150.trm -r -O
 Test=50
-F1="-P prog$Test.trm -I -s term2$Test.trm -M term1$Test.trm -i -r -O"
+Flags="-P prog$Test.trm -I -s term2$Test.trm -M term1$Test.trm -i -r -O"
 Doc="Check combine sources"
 cat <<-'******************' > "prog$Test.trm"
 	rev(S) = revx(S,eos);
@@ -151,15 +150,635 @@ cat <<-'******************' > "term1$Test.trm"
 cat <<-'******************' > "term2$Test.trm"
 	xyz
 ******************
-truncate -s -1 "term2$Test.trm"
-cat <<-'******************' > "expect$Test"
+truncate -s -1 "term2$Test.trm" #get rid of final newline
+cat <<-'******************' > "expect$Test.out"
 	rev(S) = revx(S,eos);
 	revx(eos,S) = S;
 	revx(str(C,S),T) = revx(S,str(C,T));
 
 
-	rev(str(#0x7a,str(#0x79,str(#0x78,eos))))
-	str(#0x78,str(#0x79,str(#0x7a,eos)))
+	rev(str(#0x78,str(#0x79,str(#0x7a,eos))))
+	str(#0x7a,str(#0x79,str(#0x78,eos)))
 ******************
-testx "$Test" "$Doc" "$F1" "$F2" "$F3" "$F4" "$F5"
+testx "$Test" "$Doc" "$Flags"
 
+
+cat <<-'******************' > "BinaryNumbers.trm"
+	bin(#0,X) = X;
+	bin(X,bin(Y,Z)) = bin(add(X,Y),Z);
+
+	eq(bin(N,M),bin(P,Q)) = eqn(eq(N,P),M,Q);
+
+	add(#1,#1) = bin(#1,#0);
+	add(#0,X) = X;
+	add(X,#0) = X;
+	add(X,bin(Y,Z)) = bin(Y,add(X,Z));
+	add(bin(X,Y),Z) = bin(X,add(Y,Z));
+
+	mul(#0,N) = #0;      mul(N,#0) = #0;
+	mul(#1,N) = N;      mul(N,#1) = N;
+	mul(bin(A,B),bin(C,D))
+	   = bin(bin(mul(A,C),add(mul(A,D),mul(B,C))),mul(B,D));
+
+	succ(N) = add(N,#1);
+******************
+
+Test=100
+Flags="-P BinaryNumbers.trm -T term$Test.trm -r -O"
+Doc="Scan Numbers 0, 1"
+cat <<-'******************' > "term$Test.trm"
+	mul(bin(bin(#1,#0),#1),bin(bin(#1,#1),#0))
+******************
+cat <<-'******************' > "expect$Test.out"
+	bin(bin(bin(bin(#0x1,#0x1),#0x1),#0x1),#0x0)
+******************
+testx "$Test" "$Doc" "$Flags"
+
+
+cat <<-'******************' > "HexConvert.trm"
+	shftr(bin(bin(bin(bin(B,B3),B2),B1),B0)) = B;
+	shftr(N) = #0;
+
+	shftl(N) = bin(bin(bin(bin(N,#0),#0),#0),#0);
+
+	modF(bin(bin(bin(bin(B,B3),B2),B1),B0)) = bin(bin(bin(B3,B2),B1),B0);
+	modF(N) = N;
+
+	hex(N)
+	   = cat(quad(shftr(shftr(shftr(shftr(shftr(shftr(shftr(N)))))))),
+	     cat(quad(modF(shftr(shftr(shftr(shftr(shftr(shftr(N)))))))),
+	     cat(quad(modF(shftr(shftr(shftr(shftr(shftr(N))))))),
+	     cat(quad(modF(shftr(shftr(shftr(shftr(N)))))),
+	     cat(quad(modF(shftr(shftr(shftr(N))))),
+	     cat(quad(modF(shftr(shftr(N)))),
+	     cat(quad(modF(shftr(N))),
+	     cat(quad(modF(N)),eos))))))));
+
+	quad(#0) = '0';
+	quad(#1) = '1';
+	quad(bin(#1,#0)) = '2';
+	quad(bin(#1,#1)) = '3';
+	quad(bin(bin(#1,#0),#0)) = '4';
+	quad(bin(bin(#1,#0),#1)) = '5';
+	quad(bin(bin(#1,#1),#0)) = '6';
+	quad(bin(bin(#1,#1),#1)) = '7';
+	quad(bin(bin(bin(#1,#0),#0),#0)) = '8';
+	quad(bin(bin(bin(#1,#0),#0),#1)) = '9';
+	quad(bin(bin(bin(#1,#0),#1),#0)) = 'a';
+	quad(bin(bin(bin(#1,#0),#1),#1)) = 'b';
+	quad(bin(bin(bin(#1,#1),#0),#0)) = 'c';
+	quad(bin(bin(bin(#1,#1),#0),#1)) = 'd';
+	quad(bin(bin(bin(#1,#1),#1),#0)) = 'e';
+	quad(bin(bin(bin(#1,#1),#1),#1)) = 'f';
+******************
+
+Test=110
+Flags="-p BinaryNumbers.trm -p HexConvert.trm -C -T term$Test.trm -r -O"
+Doc="Hex convert; larger terms"
+cat <<-'******************' > "term$Test.trm"
+	hex(bin(bin(bin(bin(#0x1,#0x1),#0x1),#0x1),#0x0))
+******************
+cat <<-'******************' > "expect$Test.out"
+	cat(#0x30,cat(#0x30,cat(#0x30,cat(#0x30,cat(#0x30,cat(#0x30,cat(#0x31,cat(#0x65,eos))))))))
+******************
+#output means bin 11110 => hex 0000001e, Cat isn't reduced 'cos Strings.trm not yet included
+testx "$Test" "$Doc" "$Flags"
+
+
+# Some Basics
+cat <<-'******************' > "Lists.trm"
+	append(C,eos) = str(C,eos);
+	append(B,str(C,S)) = cat(C,append(B,S));
+	append(X,eol) = lst(X,eol);
+	append(Y,lst(X,L)) = lst(X,append(Y,L));
+	append(X,eoa) = arg(X,eoa);
+	append(Y,arg(X,Xs)) = arg(X,append(Y,Xs));
+	append(X,trm(F,Xs)) = trm(F,append(X,Xs));
+
+	first(lst(X,L)) = X;
+	first(str(C,S)) = C;
+
+	rest(lst(X,L)) = L;
+	rest(str(C,S)) = S;
+******************
+cat <<-'******************' > "Strings.trm"
+	cat(str(C,S),T) = str(C,cat(S,T));
+	cat(eos,T) = T;
+	cat(C,T) = str(C,T);
+
+	eq(str(C1,S1),str(C2,S2)) = eqn(eq(C1,C2),S1,S2);
+	eq(eos,eos) = ok;
+
+	eqn(ok,S1,S2) = eq(S1,S2);
+
+	reverse(eos) = eos;
+	reverse(str(C,S)) = reversex(C,S,eos);
+
+	reversex(C,eos,S) = str(C,S);
+	reversex(C,str(B,S),T) = reversex(B,S,str(C,T));
+
+	eq('a','a') = ok;  eq('b','b') = ok;  eq('c','c') = ok;  eq('d','d') = ok;
+	eq('e','e') = ok;  eq('f','f') = ok;  eq('g','g') = ok;  eq('h','h') = ok;
+	eq('i','i') = ok;  eq('j','j') = ok;  eq('k','k') = ok;  eq('l','l') = ok;
+	eq('m','m') = ok;  eq('n','n') = ok;  eq('o','o') = ok;  eq('p','p') = ok;
+	eq('q','q') = ok;  eq('r','r') = ok;  eq('s','s') = ok;  eq('t','t') = ok;
+	eq('u','u') = ok;  eq('v','v') = ok;  eq('w','w') = ok;  eq('x','x') = ok;
+	eq('y','y') = ok;  eq('z','z') = ok;
+	eq('A','A') = ok;  eq('B','B') = ok;  eq('C','C') = ok;  eq('D','D') = ok;
+	eq('E','E') = ok;  eq('F','F') = ok;  eq('G','G') = ok;  eq('H','H') = ok;
+	eq('I','I') = ok;  eq('J','J') = ok;  eq('K','K') = ok;  eq('L','L') = ok;
+	eq('M','M') = ok;  eq('N','N') = ok;  eq('O','O') = ok;  eq('P','P') = ok;
+	eq('Q','Q') = ok;  eq('R','R') = ok;  eq('S','S') = ok;  eq('T','T') = ok;
+	eq('U','U') = ok;  eq('V','V') = ok;  eq('W','W') = ok;  eq('X','X') = ok;
+	eq('Y','Y') = ok;  eq('Z','Z') = ok;
+	eq('0','0') = ok;  eq('1','1') = ok;  eq('2','2') = ok;  eq('3','3') = ok;
+	eq('4','4') = ok;  eq('5','5') = ok;  eq('6','6') = ok;  eq('7','7') = ok;
+	eq('8','8') = ok;  eq('9','9') = ok;
+	eq('!','!') = ok;  eq('"','"') = ok;  eq('#','#') = ok;  eq('(','(') = ok;
+	eq(')',')') = ok;  eq(',',',') = ok;  eq('.','.') = ok;  eq(';',';') = ok;
+	eq('=','=') = ok;  eq('^','^') = ok;
+	eq(#0x20,#0x20)= ok; eq(#0x0A,#0x0A)= ok; eq(#0x21,#0x21)= ok; eq(#0x0D,#0x0D)= ok;
+	eq(#09,#09) = ok;
+
+	aschr(bin(bin(bin(#1,#0),#0),#1)) = #0x09;
+	aschr(bin(bin(bin(#1,#0),#1),#0)) = #0x0A;
+	aschr(bin(bin(bin(#1,#1),#0),#1)) = #0x0D;
+	aschr(bin(bin(bin(bin(bin(#1,#0),#0),#0),#0),#0)) = #0x20;
+
+	aschr(bin(bin(bin(bin(bin(#1,#0),#0),#0),#0),#1)) = '!';
+	aschr(bin(bin(bin(bin(bin(#1,#0),#0),#0),#1),#0)) = '"';
+	aschr(bin(bin(bin(bin(bin(#1,#0),#0),#0),#1),#1)) = '#';
+	aschr(bin(bin(bin(bin(bin(#1,#0),#1),#0),#0),#0)) = '(';
+	aschr(bin(bin(bin(bin(bin(#1,#0),#1),#0),#0),#1)) = ')';
+	aschr(bin(bin(bin(bin(bin(#1,#0),#1),#1),#0),#0)) = ',';
+	aschr(bin(bin(bin(bin(bin(#1,#0),#1),#1),#1),#0)) = '.';
+	aschr(bin(bin(bin(bin(bin(#1,#1),#1),#0),#1),#0)) = ':';
+	aschr(bin(bin(bin(bin(bin(#1,#1),#1),#0),#1),#1)) = ';';
+	aschr(bin(bin(bin(bin(bin(#1,#1),#1),#1),#0),#1)) = '=';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#1),#1),#1),#1),#0)) = '^';
+
+	aschr(bin(bin(bin(bin(bin(#1,#1),#0),#0),#0),#0)) = '0';
+	aschr(bin(bin(bin(bin(bin(#1,#1),#0),#0),#0),#1)) = '1';
+	aschr(bin(bin(bin(bin(bin(#1,#1),#0),#0),#1),#0)) = '2';
+	aschr(bin(bin(bin(bin(bin(#1,#1),#0),#0),#1),#1)) = '3';
+	aschr(bin(bin(bin(bin(bin(#1,#1),#0),#1),#0),#0)) = '4';
+	aschr(bin(bin(bin(bin(bin(#1,#1),#0),#1),#0),#1)) = '5';
+	aschr(bin(bin(bin(bin(bin(#1,#1),#0),#1),#1),#0)) = '6';
+	aschr(bin(bin(bin(bin(bin(#1,#1),#0),#1),#1),#1)) = '7';
+	aschr(bin(bin(bin(bin(bin(#1,#1),#1),#0),#0),#0)) = '8';
+	aschr(bin(bin(bin(bin(bin(#1,#1),#1),#0),#0),#1)) = '9';
+
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#0),#0),#1)) = 'a';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#0),#1),#0)) = 'b';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#0),#1),#1)) = 'c';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#1),#0),#0)) = 'd';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#1),#0),#1)) = 'e';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#1),#1),#0)) = 'f';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#1),#1),#1)) = 'g';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#0),#0),#0)) = 'h';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#0),#0),#1)) = 'i';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#0),#1),#0)) = 'j';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#0),#1),#1)) = 'k';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#1),#0),#0)) = 'l';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#1),#0),#1)) = 'm';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#1),#1),#0)) = 'n';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#1),#1),#1)) = 'o';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#0),#0),#0)) = 'p';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#0),#0),#1)) = 'q';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#0),#1),#0)) = 'r';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#0),#1),#1)) = 's';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#1),#0),#0)) = 't';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#1),#0),#1)) = 'u';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#1),#1),#0)) = 'v';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#1),#1),#1)) = 'w';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#1),#1),#0),#0),#0)) = 'x';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#1),#1),#0),#0),#1)) = 'y';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#1),#1),#1),#0),#1),#0)) = 'z';
+
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#0),#0),#1)) = 'A';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#0),#1),#0)) = 'B';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#0),#1),#1)) = 'C';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#1),#0),#0)) = 'D';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#1),#0),#1)) = 'E';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#1),#1),#0)) = 'F';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#1),#1),#1)) = 'G';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#0),#0),#0)) = 'H';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#0),#0),#1)) = 'I';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#0),#1),#0)) = 'J';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#0),#1),#1)) = 'K';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#1),#0),#0)) = 'L';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#1),#0),#1)) = 'M';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#1),#1),#0)) = 'N';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#1),#1),#1)) = 'O';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#0),#0),#0)) = 'P';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#0),#0),#1)) = 'Q';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#0),#1),#0)) = 'R';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#0),#1),#1)) = 'S';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#1),#0),#0)) = 'T';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#1),#0),#1)) = 'U';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#1),#1),#0)) = 'V';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#1),#1),#1)) = 'W';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#1),#1),#0),#0),#0)) = 'X';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#1),#1),#0),#0),#1)) = 'Y';
+	aschr(bin(bin(bin(bin(bin(bin(#1,#0),#1),#1),#0),#1),#0)) = 'Z';
+
+	ascii(#0x09) = bin(bin(bin(bin(bin(#0,#0),#1),#0),#0),#1);
+	ascii(#0x0A) = bin(bin(bin(bin(bin(#0,#0),#1),#0),#1),#0);
+	ascii(#0x0D) = bin(bin(bin(bin(bin(#0,#0),#1),#1),#0),#1);
+	ascii(#0x20) = bin(bin(bin(bin(bin(#1,#0),#0),#0),#0),#0);
+
+	ascii('!') = bin(bin(bin(bin(bin(#1,#0),#0),#0),#0),#1);
+	ascii('"') = bin(bin(bin(bin(bin(#1,#0),#0),#0),#1),#0);
+	ascii('#') = bin(bin(bin(bin(bin(#1,#0),#0),#0),#1),#1);
+	ascii('(') = bin(bin(bin(bin(bin(#1,#0),#1),#0),#0),#0);
+	ascii(')') = bin(bin(bin(bin(bin(#1,#0),#1),#0),#0),#1);
+	ascii(',') = bin(bin(bin(bin(bin(#1,#0),#1),#1),#0),#0);
+	ascii('.') = bin(bin(bin(bin(bin(#1,#0),#1),#1),#1),#0);
+	ascii(':') = bin(bin(bin(bin(bin(#1,#1),#1),#0),#1),#0);
+	ascii(';') = bin(bin(bin(bin(bin(#1,#1),#1),#0),#1),#1);
+	ascii('=') = bin(bin(bin(bin(bin(#1,#1),#1),#1),#0),#1);
+	ascii('^') = bin(bin(bin(bin(bin(bin(#1,#1),#1),#1),#1),#1),#0);
+
+	ascii('0') = bin(bin(bin(bin(bin(bin(#0,#1),#1),#0),#0),#0),#0);
+	ascii('1') = bin(bin(bin(bin(bin(bin(#0,#1),#1),#0),#0),#0),#1);
+	ascii('2') = bin(bin(bin(bin(bin(bin(#0,#1),#1),#0),#0),#1),#0);
+	ascii('3') = bin(bin(bin(bin(bin(bin(#0,#1),#1),#0),#0),#1),#1);
+	ascii('4') = bin(bin(bin(bin(bin(bin(#0,#1),#1),#0),#1),#0),#0);
+	ascii('5') = bin(bin(bin(bin(bin(bin(#0,#1),#1),#0),#1),#0),#1);
+	ascii('6') = bin(bin(bin(bin(bin(bin(#0,#1),#1),#0),#1),#1),#0);
+	ascii('7') = bin(bin(bin(bin(bin(bin(#0,#1),#1),#0),#1),#1),#1);
+	ascii('8') = bin(bin(bin(bin(bin(bin(#0,#1),#1),#1),#0),#0),#0);
+	ascii('9') = bin(bin(bin(bin(bin(bin(#0,#1),#1),#1),#0),#0),#1);
+
+	ascii('a') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#0),#0),#1);
+	ascii('b') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#0),#1),#0);
+	ascii('c') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#0),#1),#1);
+	ascii('d') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#1),#0),#0);
+	ascii('e') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#1),#0),#1);
+	ascii('f') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#1),#1),#0);
+	ascii('g') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#0),#1),#1),#1);
+	ascii('h') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#0),#0),#0);
+	ascii('i') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#0),#0),#1);
+	ascii('j') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#0),#1),#0);
+	ascii('k') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#0),#1),#1);
+	ascii('l') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#1),#0),#0);
+	ascii('m') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#1),#0),#1);
+	ascii('n') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#1),#1),#0);
+	ascii('o') = bin(bin(bin(bin(bin(bin(#1,#1),#0),#1),#1),#1),#1);
+	ascii('p') = bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#0),#0),#0);
+	ascii('q') = bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#0),#0),#1);
+	ascii('r') = bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#0),#1),#0);
+	ascii('s') = bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#0),#1),#1);
+	ascii('t') = bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#1),#0),#0);
+	ascii('u') = bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#1),#0),#1);
+	ascii('v') = bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#1),#1),#0);
+	ascii('w') = bin(bin(bin(bin(bin(bin(#1,#1),#1),#0),#1),#1),#1);
+	ascii('x') = bin(bin(bin(bin(bin(bin(#1,#1),#1),#1),#0),#0),#0);
+	ascii('y') = bin(bin(bin(bin(bin(bin(#1,#1),#1),#1),#0),#0),#1);
+	ascii('z') = bin(bin(bin(bin(bin(bin(#1,#1),#1),#1),#0),#1),#0);
+
+	ascii('A') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#0),#0),#1);
+	ascii('B') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#0),#1),#0);
+	ascii('C') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#0),#1),#1);
+	ascii('D') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#1),#0),#0);
+	ascii('E') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#1),#0),#1);
+	ascii('F') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#1),#1),#0);
+	ascii('G') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#0),#1),#1),#1);
+	ascii('H') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#0),#0),#0);
+	ascii('I') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#0),#0),#1);
+	ascii('J') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#0),#1),#0);
+	ascii('K') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#0),#1),#1);
+	ascii('L') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#1),#0),#0);
+	ascii('M') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#1),#0),#1);
+	ascii('N') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#1),#1),#0);
+	ascii('O') = bin(bin(bin(bin(bin(bin(#1,#0),#0),#1),#1),#1),#1);
+	ascii('P') = bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#0),#0),#0);
+	ascii('Q') = bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#0),#0),#1);
+	ascii('R') = bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#0),#1),#0);
+	ascii('S') = bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#0),#1),#1);
+	ascii('T') = bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#1),#0),#0);
+	ascii('U') = bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#1),#0),#1);
+	ascii('V') = bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#1),#1),#0);
+	ascii('W') = bin(bin(bin(bin(bin(bin(#1,#0),#1),#0),#1),#1),#1);
+	ascii('X') = bin(bin(bin(bin(bin(bin(#1,#0),#1),#1),#0),#0),#0);
+	ascii('Y') = bin(bin(bin(bin(bin(bin(#1,#0),#1),#1),#0),#0),#1);
+	ascii('Z') = bin(bin(bin(bin(bin(bin(#1,#0),#1),#1),#0),#1),#0);
+******************
+
+
+Test=120
+Flags="-p Lists.trm -p BinaryNumbers.trm -p Strings.trm -C -T term$Test.trm -r -O"
+Doc="Hex convert; larger terms"
+cat <<-'******************' > "term$Test.trm"
+	first(lst(aschr(add(ascii('a'),#1)),eol))
+******************
+cat <<-'******************' > "expect$Test.out"
+	#0x62
+******************
+#output means bin 11110 => hex 0000001e, Cat isn't reduced 'cos Strings.trm not yet included
+testx "$Test" "$Doc" "$Flags"
+
+
+
+# Define scanner
+cat <<-'******************' > "ScannerParser.trm"
+	scan(str(C,S)) = sccc(cc(C),C,S,null,eol);
+	
+	sccc(ws,C,S,V,Stck) = sccc(cc(first(S)),first(S),rest(S),V,Stck);
+	
+	sccc(comm,C,S,V,Stck) = sccomm(S,V,Stck);
+	sccc(low,C,str(B,S),V,Stck) = scsym(cc(B),B,S,low,str(C,eos),Stck);
+	sccc(cap,C,str(B,S),V,Stck) = scsym(cc(B),B,S,cap,str(C,eos),Stck);
+	sccc(spec,C,S,V,Stck) = scspec(C,S,Stck);
+	sccc(quot,C,S,V,Stck) = scstring(first(S),rest(S),eos,Stck);
+	sccc(lpar,C,S,V,Stck)
+	= sccc(cc(first(S)),first(S),rest(S),null,lst(trm(V,eoa),Stck));
+	sccc(cc(first(eos)),C,S,V,Stck) = scfinalize(C,S,V,Stck);
+	sccc(X,first(eos),Y,V,Z) = V;
+	sccc(CC,C,S,V,Stck) = scaffix(CC,S,V,Stck);
+	
+	! V is var(), trm(), str(), ^C, #C
+	
+	scaffix(colon,S,F,Stck) = sclini(equ,S,lst(trm(F,eoa),Stck));
+	scaffix(equ,S,var(V),Stck)
+	= sclini(equ,S,lst(trm(str('r',str('l',eos)),arg(var(V),eoa)),Stck));
+	scaffix(equ,S,str(F,Fs),Stck)
+	= sclini(equ,S,
+			lst(trm(str('r',str('l',eos)),arg(trm(str(F,Fs),eoa),eoa)),Stck));
+	scaffix(equ,S,trm(F,As),Stck)
+	= sclini(equ,S,lst(trm(str('r',str('l',eos)),arg(trm(F,As),eoa)),Stck));
+	scaffix(equ,S,F,Stck)
+	= sclini(equ,S,lst(trm(str('r',str('l',eos)),arg(trm(F,eoa),eoa)),Stck));
+	scaffix(Cc,S,var(V),lst(T,Stck))
+	= sclini(Cc,S,lst(append(var(V),T),Stck));
+	scaffix(Cc,S,str(F,Fs),lst(T,Stck))
+	= sclini(Cc,S,lst(append(trm(str(F,Fs),eoa),T),Stck));
+	scaffix(Cc,S,trm(F,As),lst(T,Stck))
+	= sclini(Cc,S,lst(append(trm(F,As),T),Stck));
+	scaffix(Cc,S,F,lst(T,Stck))
+	= sclini(Cc,S,lst(append(trm(F,eoa),T),Stck));
+	
+	sclini(rpar,S,lst(T,Stck)) = sccc(cc(first(S)),first(S),rest(S),T,Stck);
+	sclini(Cc,S,Stck) = sccc(cc(first(S)),first(S),rest(S),null,Stck);
+	
+	scfinalize(first(eos),rest(eos),trm(F,As),eol) = trm(F,As);
+	scfinalize(first(eos),rest(eos),F,eol) = trm(F,eoa);
+	scfinalize(first(eos),rest(eos),null,Stck) = sccollrls(eol,Stck);
+	
+	sccollrls(Rs,lst(trm(str('r',str('l',eos)),arg(L,arg(R,eoa))),Stck))
+	= sccollrls(trm(str('r',str('l',eos)),arg(L,arg(R,arg(Rs,eoa)))),Stck);
+	sccollrls(V,eol) = V;
+	
+	scsym(low,C,str(B,S),CC,V,Stck) = scsym(cc(B),B,S,CC,cat(C,V),Stck);
+	scsym(cap,C,str(B,S),CC,V,Stck) = scsym(cc(B),B,S,CC,cat(C,V),Stck);
+	scsym(num,C,str(B,S),CC,V,Stck) = scsym(cc(B),B,S,CC,cat(C,V),Stck);
+	scsym(X,C,S,low,V,Stck) = sccc(X,C,S,reverse(V),Stck);
+	scsym(X,C,S,cap,V,Stck) = sccc(X,C,S,var(reverse(V)),Stck);
+	
+	scspec('#',str('0',str('x',S)),Stck) = schx(S,eos,Stck);
+	scspec('#',str('0',S),Stck) = scdec(S,str('0',eos),Stck);
+	scspec('#',str('-',S),Stck) = scdec(S,str('-',eos),Stck);
+	scspec('#',S,Stck) = scdec(S,eos,Stck);
+	scspec(#0x27,str(C,str(#0x27,S)),Stck) = sccc(cc(first(S)),first(S),rest(S),C,Stck);
+
+	sccomm(str(#0xA,S),V,Stck) = sccc(cc(first(S)),first(S),rest(S),V,Stck);
+	sccomm(str(C,S),V,Stck) = sccomm(S,V,Stck);
+	
+	
+	! scspec('#',str(C,str(D,S)),Stck) = sccc(cc(first(S)),first(S),rest(S),
+	!                                       aschr(add(shftl(unhex(C)),unhex(D))),Stck);
+	
+	! scstring('',str(C,S),V,Stck) = sccc(cc(C),C,S,reverse(V),Stck);
+	scstring(C,str(B,S),V,Stck) = scstring(B,S,cat(C,V),Stck);
+	
+	scdec(str('0',S),V,Stck) = scdec(S,str('0',V),Stck);
+	scdec(str('1',S),V,Stck) = scdec(S,str('1',V),Stck);
+	scdec(str('2',S),V,Stck) = scdec(S,str('2',V),Stck);
+	scdec(str('3',S),V,Stck) = scdec(S,str('3',V),Stck);
+	scdec(str('4',S),V,Stck) = scdec(S,str('4',V),Stck);
+	scdec(str('5',S),V,Stck) = scdec(S,str('5',V),Stck);
+	scdec(str('6',S),V,Stck) = scdec(S,str('6',V),Stck);
+	scdec(str('7',S),V,Stck) = scdec(S,str('7',V),Stck);
+	scdec(str('8',S),V,Stck) = scdec(S,str('8',V),Stck);
+	scdec(str('9',S),V,Stck) = scdec(S,str('9',V),Stck);
+	scdec(S,V,Stck) = sccc(cc(first(S)),first(S),rest(S),rev(V),Stck);
+	
+	schx(str('a',S),V,Stck) = schx(S,str('A',V),Stck);
+	schx(str('b',S),V,Stck) = schx(S,str('B',V),Stck);
+	schx(str('c',S),V,Stck) = schx(S,str('C',V),Stck);
+	schx(str('d',S),V,Stck) = schx(S,str('D',V),Stck);
+	schx(str('e',S),V,Stck) = schx(S,str('E',V),Stck);
+	schx(str('f',S),V,Stck) = schx(S,str('F',V),Stck);
+	schx(str('A',S),V,Stck) = schx(S,str('A',V),Stck);
+	schx(str('B',S),V,Stck) = schx(S,str('B',V),Stck);
+	schx(str('C',S),V,Stck) = schx(S,str('C',V),Stck);
+	schx(str('D',S),V,Stck) = schx(S,str('D',V),Stck);
+	schx(str('E',S),V,Stck) = schx(S,str('E',V),Stck);
+	schx(str('F',S),V,Stck) = schx(S,str('F',V),Stck);
+	schx(str('0',S),V,Stck) = schx(S,str('0',V),Stck);
+	schx(str('1',S),V,Stck) = schx(S,str('1',V),Stck);
+	schx(str('2',S),V,Stck) = schx(S,str('2',V),Stck);
+	schx(str('3',S),V,Stck) = schx(S,str('3',V),Stck);
+	schx(str('4',S),V,Stck) = schx(S,str('4',V),Stck);
+	schx(str('5',S),V,Stck) = schx(S,str('5',V),Stck);
+	schx(str('6',S),V,Stck) = schx(S,str('6',V),Stck);
+	schx(str('7',S),V,Stck) = schx(S,str('7',V),Stck);
+	schx(str('8',S),V,Stck) = schx(S,str('8',V),Stck);
+	schx(str('9',S),V,Stck) = schx(S,str('9',V),Stck);
+	schx(S,V,Stck) = sccc(cc(first(S)),first(S),rest(S),rev(V),Stck);
+	
+	cc('*') = low;  cc('&') = low;
+	cc('a') = low;  cc('b') = low;  cc('c') = low;  cc('d') = low;  cc('e') = low;
+	cc('f') = low;  cc('g') = low;  cc('h') = low;  cc('i') = low;  cc('j') = low;
+	cc('k') = low;  cc('l') = low;  cc('m') = low;  cc('n') = low;  cc('o') = low;
+	cc('p') = low;  cc('q') = low;  cc('r') = low;  cc('s') = low;  cc('t') = low;
+	cc('u') = low;  cc('v') = low;  cc('w') = low;  cc('x') = low;  cc('y') = low;
+	cc('z') = low;
+	cc('@') = cap;  cc('$') = cap;  
+	cc('A') = cap;  cc('B') = cap;  cc('C') = cap;  cc('D') = cap;  cc('E') = cap;
+	cc('F') = cap;  cc('G') = cap;  cc('H') = cap;  cc('I') = cap;  cc('J') = cap;
+	cc('K') = cap;  cc('L') = cap;  cc('M') = cap;  cc('N') = cap;  cc('O') = cap;
+	cc('P') = cap;  cc('Q') = cap;  cc('R') = cap;  cc('S') = cap;  cc('T') = cap;
+	cc('U') = cap;  cc('V') = cap;  cc('W') = cap;  cc('X') = cap;  cc('Y') = cap;
+	cc('Z') = cap;
+	cc('0') = num;  cc('1') = num;  cc('2') = num;  cc('3') = num;  cc('4') = num;
+	cc('5') = num;  cc('6') = num;  cc('7') = num;  cc('8') = num;  cc('9') = num;
+	cc('(') = lpar; cc(')') = rpar; cc(',') = sepa;
+	cc('=') = equ;  cc(';') = sepa; cc(':') = colon;   ! cc('.') = period;
+	cc(#0x27) = spec; cc('#') = spec;
+	cc('!') = comm; cc('"') = quot;
+	cc(#0x20) = ws;  cc(#0xA) = ws;  cc(#0xD) = ws;  cc(#0x9) = ws;
+******************
+
+
+Test=200
+Flags="-D 1 -X 2 -p ScannerParser.trm -p Lists.trm -p Strings.trm -C -s term2$Test.trm -M term1$Test.trm -r -O"
+Doc="Scanner scan simple term"
+cat <<-'******************' > "term1$Test.trm"
+	scan(%1)
+******************
+cat <<-'******************' > "term2$Test.trm"
+	p(p(z))
+******************
+cat <<-'******************' > "expect$Test.out"
+
+	### Start ###
+	### Done! ###
+	trm("p",arg(trm("p",arg(trm("z",eoa),eoa)),eoa))
+******************
+testx "$Test" "$Doc" "$Flags"
+
+
+Test=210
+Flags="-D 1 -p ScannerParser.trm -p Lists.trm -p Strings.trm -C  -s term2$Test.trm -M term1$Test.trm -r -O"
+Doc="Scanner scan simple spec"
+cat <<-'******************' > "term1$Test.trm"
+	scan(%1)
+******************
+cat <<-'******************' > "term2$Test.trm"
+	a(X,p(Y)) = p(a(X,Y));
+	a(z,X) = X;
+	a(X,Y) = a(Y,X);
+******************
+cat <<-'******************' > "expect$Test.out"
+
+	### Start ###
+	### Done! ###
+	trm("rl",arg(trm("a",arg(var("X"),arg(trm("p",arg(var("Y"),eoa)),eoa))),arg(trm("p",arg(trm("a",arg(var("X"),arg(var("Y"),eoa))),eoa)),arg(trm("rl",arg(trm("a",arg(trm("z",eoa),arg(var("X"),eoa))),arg(var("X"),arg(trm("rl",arg(trm("a",arg(var("X"),arg(var("Y"),eoa))),arg(trm("a",arg(var("Y"),arg(var("X"),eoa))),arg(eol,eoa)))),eoa)))),eoa))))
+******************
+testx "$Test" "$Doc" "$Flags"
+
+
+
+Test=220
+Flags="-D 1 -X 2 -p ScannerParser.trm -p Lists.trm -p Strings.trm -C  -s Lists.trm -M term1$Test.trm -r -O"
+Doc="Scanner scan Lists module"
+cat <<-'******************' > "term1$Test.trm"
+	scan(%1)
+******************
+cat <<-'******************' > "expect$Test.out"
+
+	### Start ###
+	### Done! ###
+	trm("rl",arg(trm("append",arg(var("C"),arg(trm("eos",eoa),eoa))),arg(trm("str",arg(var("C"),arg(trm("eos",eoa),eoa))),arg(trm("rl",arg(trm("append",arg(var("B"),arg(trm("str",arg(var("C"),arg(var("S"),eoa))),eoa))),arg(trm("cat",arg(var("C"),arg(trm("append",arg(var("B"),arg(var("S"),eoa))),eoa))),arg(trm("rl",arg(trm("append",arg(var("X"),arg(trm("eol",eoa),eoa))),arg(trm("lst",arg(var("X"),arg(trm("eol",eoa),eoa))),arg(trm("rl",arg(trm("append",arg(var("Y"),arg(trm("lst",arg(var("X"),arg(var("L"),eoa))),eoa))),arg(trm("lst",arg(var("X"),arg(trm("append",arg(var("Y"),arg(var("L"),eoa))),eoa))),arg(trm("rl",arg(trm("append",arg(var("X"),arg(trm("eoa",eoa),eoa))),arg(trm("arg",arg(var("X"),arg(trm("eoa",eoa),eoa))),arg(trm("rl",arg(trm("append",arg(var("Y"),arg(trm("arg",arg(var("X"),arg(var("Xs"),eoa))),eoa))),arg(trm("arg",arg(var("X"),arg(trm("append",arg(var("Y"),arg(var("Xs"),eoa))),eoa))),arg(trm("rl",arg(trm("append",arg(var("X"),arg(trm("trm",arg(var("F"),arg(var("Xs"),eoa))),eoa))),arg(trm("trm",arg(var("F"),arg(trm("append",arg(var("X"),arg(var("Xs"),eoa))),eoa))),arg(trm("rl",arg(trm("first",arg(trm("lst",arg(var("X"),arg(var("L"),eoa))),eoa)),arg(var("X"),arg(trm("rl",arg(trm("first",arg(trm("str",arg(var("C"),arg(var("S"),eoa))),eoa)),arg(var("C"),arg(trm("rl",arg(trm("rest",arg(trm("lst",arg(var("X"),arg(var("L"),eoa))),eoa)),arg(var("L"),arg(trm("rl",arg(trm("rest",arg(trm("str",arg(var("C"),arg(var("S"),eoa))),eoa)),arg(var("S"),arg(eol,eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa))))
+******************
+testx "$Test" "$Doc" "$Flags"
+
+
+
+Test=230
+Flags="-D 1 -X 10 -p ScannerParser.trm -p Lists.trm -p Strings.trm -C  -s Strings.trm -M term1$Test.trm -r -O"
+Doc="Scanner Lists module"
+cat <<-'******************' > "term1$Test.trm"
+	scan(%1)
+******************
+cat <<-'******************' > "expect$Test.out"
+
+	### Start ###
+	### Done! ###
+	trm("rl",arg(trm("cat",arg(trm("str",arg(var("C"),arg(var("S"),eoa))),arg(var("T"),eoa))),arg(trm("str",arg(var("C"),arg(trm("cat",arg(var("S"),arg(var("T"),eoa))),eoa))),arg(trm("rl",arg(trm("cat",arg(trm("eos",eoa),arg(var("T"),eoa))),arg(var("T"),arg(trm("rl",arg(trm("cat",arg(var("C"),arg(var("T"),eoa))),arg(trm("str",arg(var("C"),arg(var("T"),eoa))),arg(trm("rl",arg(trm("eq",arg(trm("str",arg(var("C1"),arg(var("S1"),eoa))),arg(trm("str",arg(var("C2"),arg(var("S2"),eoa))),eoa))),arg(trm("eqn",arg(trm("eq",arg(var("C1"),arg(var("C2"),eoa))),arg(var("S1"),arg(var("S2"),eoa)))),arg(trm("rl",arg(trm("eq",arg(trm("eos",eoa),arg(trm("eos",eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eqn",arg(trm("ok",eoa),arg(var("S1"),arg(var("S2"),eoa)))),arg(trm("eq",arg(var("S1"),arg(var("S2"),eoa))),arg(trm("rl",arg(trm("reverse",arg(trm("eos",eoa),eoa)),arg(trm("eos",eoa),arg(trm("rl",arg(trm("reverse",arg(trm("str",arg(var("C"),arg(var("S"),eoa))),eoa)),arg(trm("reversex",arg(var("C"),arg(var("S"),arg(trm("eos",eoa),eoa)))),arg(trm("rl",arg(trm("reversex",arg(var("C"),arg(trm("eos",eoa),arg(var("S"),eoa)))),arg(trm("str",arg(var("C"),arg(var("S"),eoa))),arg(trm("rl",arg(trm("reversex",arg(var("C"),arg(trm("str",arg(var("B"),arg(var("S"),eoa))),arg(var("T"),eoa)))),arg(trm("reversex",arg(var("B"),arg(var("S"),arg(trm("str",arg(var("C"),arg(var("T"),eoa))),eoa)))),arg(trm("rl",arg(trm("eq",arg(trm(#0x61,eoa),arg(trm(#0x61,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x62,eoa),arg(trm(#0x62,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x63,eoa),arg(trm(#0x63,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x64,eoa),arg(trm(#0x64,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x65,eoa),arg(trm(#0x65,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x66,eoa),arg(trm(#0x66,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x67,eoa),arg(trm(#0x67,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x68,eoa),arg(trm(#0x68,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x69,eoa),arg(trm(#0x69,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x6a,eoa),arg(trm(#0x6a,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x6b,eoa),arg(trm(#0x6b,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x6c,eoa),arg(trm(#0x6c,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x6d,eoa),arg(trm(#0x6d,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x6e,eoa),arg(trm(#0x6e,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x6f,eoa),arg(trm(#0x6f,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x70,eoa),arg(trm(#0x70,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x71,eoa),arg(trm(#0x71,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x72,eoa),arg(trm(#0x72,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x73,eoa),arg(trm(#0x73,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x74,eoa),arg(trm(#0x74,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x75,eoa),arg(trm(#0x75,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x76,eoa),arg(trm(#0x76,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x77,eoa),arg(trm(#0x77,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x78,eoa),arg(trm(#0x78,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x79,eoa),arg(trm(#0x79,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x7a,eoa),arg(trm(#0x7a,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x41,eoa),arg(trm(#0x41,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x42,eoa),arg(trm(#0x42,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x43,eoa),arg(trm(#0x43,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x44,eoa),arg(trm(#0x44,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x45,eoa),arg(trm(#0x45,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x46,eoa),arg(trm(#0x46,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x47,eoa),arg(trm(#0x47,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x48,eoa),arg(trm(#0x48,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x49,eoa),arg(trm(#0x49,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x4a,eoa),arg(trm(#0x4a,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x4b,eoa),arg(trm(#0x4b,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x4c,eoa),arg(trm(#0x4c,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x4d,eoa),arg(trm(#0x4d,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x4e,eoa),arg(trm(#0x4e,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x4f,eoa),arg(trm(#0x4f,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x50,eoa),arg(trm(#0x50,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x51,eoa),arg(trm(#0x51,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x52,eoa),arg(trm(#0x52,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x53,eoa),arg(trm(#0x53,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x54,eoa),arg(trm(#0x54,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x55,eoa),arg(trm(#0x55,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x56,eoa),arg(trm(#0x56,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x57,eoa),arg(trm(#0x57,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x58,eoa),arg(trm(#0x58,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x59,eoa),arg(trm(#0x59,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x5a,eoa),arg(trm(#0x5a,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x30,eoa),arg(trm(#0x30,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x31,eoa),arg(trm(#0x31,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x32,eoa),arg(trm(#0x32,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x33,eoa),arg(trm(#0x33,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x34,eoa),arg(trm(#0x34,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x35,eoa),arg(trm(#0x35,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x36,eoa),arg(trm(#0x36,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x37,eoa),arg(trm(#0x37,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x38,eoa),arg(trm(#0x38,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x39,eoa),arg(trm(#0x39,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x21,eoa),arg(trm(#0x21,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x22,eoa),arg(trm(#0x22,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x23,eoa),arg(trm(#0x23,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x28,eoa),arg(trm(#0x28,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x29,eoa),arg(trm(#0x29,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x2c,eoa),arg(trm(#0x2c,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x2e,eoa),arg(trm(#0x2e,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x3b,eoa),arg(trm(#0x3b,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x3d,eoa),arg(trm(#0x3d,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(#0x5e,eoa),arg(trm(#0x5e,eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(rev("02"),eoa),arg(trm(rev("02"),eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(rev("A0"),eoa),arg(trm(rev("A0"),eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(rev("12"),eoa),arg(trm(rev("12"),eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(rev("D0"),eoa),arg(trm(rev("D0"),eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("eq",arg(trm(rev("90"),eoa),arg(trm(rev("90"),eoa),eoa))),arg(trm("ok",eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(rev("90"),eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(rev("A0"),eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(rev("D0"),eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(rev("02"),eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x21,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x22,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x23,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x28,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x29,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x2c,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x2e,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x3a,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x3b,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x3d,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x5e,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x30,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x31,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x32,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x33,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x34,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x35,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x36,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x37,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x38,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x39,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x61,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x62,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x63,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x64,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x65,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x66,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x67,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x68,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x69,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x6a,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x6b,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x6c,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x6d,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x6e,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x6f,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x70,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x71,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x72,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x73,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x74,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x75,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x76,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x77,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x78,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x79,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x7a,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x41,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x42,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x43,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x44,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x45,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x46,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x47,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x48,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x49,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x4a,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x4b,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x4c,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x4d,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x4e,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x4f,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x50,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x51,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x52,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x53,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x54,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x55,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x56,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x57,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x58,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),eoa)),arg(trm(#0x59,eoa),arg(trm("rl",arg(trm("aschr",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),eoa)),arg(trm(#0x5a,eoa),arg(trm("rl",arg(trm("ascii",arg(trm(rev("90"),eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(rev("A0"),eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(rev("D0"),eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(rev("02"),eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x21,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x22,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x23,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x28,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x29,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x2c,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x2e,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x3a,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x3b,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x3d,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x5e,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x30,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x31,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x32,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x33,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x34,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x35,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x36,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x37,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x38,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x39,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("0"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x61,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x62,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x63,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x64,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x65,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x66,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x67,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x68,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x69,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x6a,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x6b,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x6c,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x6d,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x6e,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x6f,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x70,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x71,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x72,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x73,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x74,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x75,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x76,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x77,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x78,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x79,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x7a,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x41,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x42,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x43,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x44,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x45,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x46,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x47,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x48,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x49,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x4a,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x4b,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x4c,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x4d,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x4e,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x4f,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x50,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x51,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x52,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x53,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x54,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x55,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x56,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x57,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x58,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x59,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm("rl",arg(trm("ascii",arg(trm(#0x5a,eoa),eoa)),arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm("bin",arg(trm(rev("1"),eoa),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(trm(rev("1"),eoa),eoa))),arg(trm(rev("0"),eoa),eoa))),arg(eol,eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa))))
+******************
+testx "$Test" "$Doc" "$Flags"
+#60575 steps
+
+
+
+Test=240
+Flags="-D 1 -X 10 -p ScannerParser.trm -p Lists.trm -p Strings.trm -C  -s ScannerParser.trm -M term1$Test.trm -r -O"
+Doc="Scanner scan self"
+cat <<-'******************' > "term1$Test.trm"
+	scan(%1)
+******************
+cat <<-'******************' > "expect$Test.out"
+
+	### Start ###
+	### Done! ###
+	trm("rl",arg(trm("scan",arg(trm("str",arg(var("C"),arg(var("S"),eoa))),eoa)),arg(trm("sccc",arg(trm("cc",arg(var("C"),eoa)),arg(var("C"),arg(var("S"),arg(trm("null",eoa),arg(trm("eol",eoa),eoa)))))),arg(trm("rl",arg(trm("sccc",arg(trm("ws",eoa),arg(var("C"),arg(var("S"),arg(var("V"),arg(var("Stck"),eoa)))))),arg(trm("sccc",arg(trm("cc",arg(trm("first",arg(var("S"),eoa)),eoa)),arg(trm("first",arg(var("S"),eoa)),arg(trm("rest",arg(var("S"),eoa)),arg(var("V"),arg(var("Stck"),eoa)))))),arg(trm("rl",arg(trm("sccc",arg(trm("comm",eoa),arg(var("C"),arg(var("S"),arg(var("V"),arg(var("Stck"),eoa)))))),arg(trm("sccomm",arg(var("S"),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("sccc",arg(trm("low",eoa),arg(var("C"),arg(trm("str",arg(var("B"),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))))),arg(trm("scsym",arg(trm("cc",arg(var("B"),eoa)),arg(var("B"),arg(var("S"),arg(trm("low",eoa),arg(trm("str",arg(var("C"),arg(trm("eos",eoa),eoa))),arg(var("Stck"),eoa))))))),arg(trm("rl",arg(trm("sccc",arg(trm("cap",eoa),arg(var("C"),arg(trm("str",arg(var("B"),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))))),arg(trm("scsym",arg(trm("cc",arg(var("B"),eoa)),arg(var("B"),arg(var("S"),arg(trm("cap",eoa),arg(trm("str",arg(var("C"),arg(trm("eos",eoa),eoa))),arg(var("Stck"),eoa))))))),arg(trm("rl",arg(trm("sccc",arg(trm("spec",eoa),arg(var("C"),arg(var("S"),arg(var("V"),arg(var("Stck"),eoa)))))),arg(trm("scspec",arg(var("C"),arg(var("S"),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("sccc",arg(trm("quot",eoa),arg(var("C"),arg(var("S"),arg(var("V"),arg(var("Stck"),eoa)))))),arg(trm("scstring",arg(trm("first",arg(var("S"),eoa)),arg(trm("rest",arg(var("S"),eoa)),arg(trm("eos",eoa),arg(var("Stck"),eoa))))),arg(trm("rl",arg(trm("sccc",arg(trm("lpar",eoa),arg(var("C"),arg(var("S"),arg(var("V"),arg(var("Stck"),eoa)))))),arg(trm("sccc",arg(trm("cc",arg(trm("first",arg(var("S"),eoa)),eoa)),arg(trm("first",arg(var("S"),eoa)),arg(trm("rest",arg(var("S"),eoa)),arg(trm("null",eoa),arg(trm("lst",arg(trm("trm",arg(var("V"),arg(trm("eoa",eoa),eoa))),arg(var("Stck"),eoa))),eoa)))))),arg(trm("rl",arg(trm("sccc",arg(trm("cc",arg(trm("first",arg(trm("eos",eoa),eoa)),eoa)),arg(var("C"),arg(var("S"),arg(var("V"),arg(var("Stck"),eoa)))))),arg(trm("scfinalize",arg(var("C"),arg(var("S"),arg(var("V"),arg(var("Stck"),eoa))))),arg(trm("rl",arg(trm("sccc",arg(var("X"),arg(trm("first",arg(trm("eos",eoa),eoa)),arg(var("Y"),arg(var("V"),arg(var("Z"),eoa)))))),arg(var("V"),arg(trm("rl",arg(trm("sccc",arg(var("CC"),arg(var("C"),arg(var("S"),arg(var("V"),arg(var("Stck"),eoa)))))),arg(trm("scaffix",arg(var("CC"),arg(var("S"),arg(var("V"),arg(var("Stck"),eoa))))),arg(trm("rl",arg(trm("scaffix",arg(trm("colon",eoa),arg(var("S"),arg(var("F"),arg(var("Stck"),eoa))))),arg(trm("sclini",arg(trm("equ",eoa),arg(var("S"),arg(trm("lst",arg(trm("trm",arg(var("F"),arg(trm("eoa",eoa),eoa))),arg(var("Stck"),eoa))),eoa)))),arg(trm("rl",arg(trm("scaffix",arg(trm("equ",eoa),arg(var("S"),arg(trm("var",arg(var("V"),eoa)),arg(var("Stck"),eoa))))),arg(trm("sclini",arg(trm("equ",eoa),arg(var("S"),arg(trm("lst",arg(trm("trm",arg(trm("str",arg(trm(#0x72,eoa),arg(trm("str",arg(trm(#0x6c,eoa),arg(trm("eos",eoa),eoa))),eoa))),arg(trm("arg",arg(trm("var",arg(var("V"),eoa)),arg(trm("eoa",eoa),eoa))),eoa))),arg(var("Stck"),eoa))),eoa)))),arg(trm("rl",arg(trm("scaffix",arg(trm("equ",eoa),arg(var("S"),arg(trm("str",arg(var("F"),arg(var("Fs"),eoa))),arg(var("Stck"),eoa))))),arg(trm("sclini",arg(trm("equ",eoa),arg(var("S"),arg(trm("lst",arg(trm("trm",arg(trm("str",arg(trm(#0x72,eoa),arg(trm("str",arg(trm(#0x6c,eoa),arg(trm("eos",eoa),eoa))),eoa))),arg(trm("arg",arg(trm("trm",arg(trm("str",arg(var("F"),arg(var("Fs"),eoa))),arg(trm("eoa",eoa),eoa))),arg(trm("eoa",eoa),eoa))),eoa))),arg(var("Stck"),eoa))),eoa)))),arg(trm("rl",arg(trm("scaffix",arg(trm("equ",eoa),arg(var("S"),arg(trm("trm",arg(var("F"),arg(var("As"),eoa))),arg(var("Stck"),eoa))))),arg(trm("sclini",arg(trm("equ",eoa),arg(var("S"),arg(trm("lst",arg(trm("trm",arg(trm("str",arg(trm(#0x72,eoa),arg(trm("str",arg(trm(#0x6c,eoa),arg(trm("eos",eoa),eoa))),eoa))),arg(trm("arg",arg(trm("trm",arg(var("F"),arg(var("As"),eoa))),arg(trm("eoa",eoa),eoa))),eoa))),arg(var("Stck"),eoa))),eoa)))),arg(trm("rl",arg(trm("scaffix",arg(trm("equ",eoa),arg(var("S"),arg(var("F"),arg(var("Stck"),eoa))))),arg(trm("sclini",arg(trm("equ",eoa),arg(var("S"),arg(trm("lst",arg(trm("trm",arg(trm("str",arg(trm(#0x72,eoa),arg(trm("str",arg(trm(#0x6c,eoa),arg(trm("eos",eoa),eoa))),eoa))),arg(trm("arg",arg(trm("trm",arg(var("F"),arg(trm("eoa",eoa),eoa))),arg(trm("eoa",eoa),eoa))),eoa))),arg(var("Stck"),eoa))),eoa)))),arg(trm("rl",arg(trm("scaffix",arg(var("Cc"),arg(var("S"),arg(trm("var",arg(var("V"),eoa)),arg(trm("lst",arg(var("T"),arg(var("Stck"),eoa))),eoa))))),arg(trm("sclini",arg(var("Cc"),arg(var("S"),arg(trm("lst",arg(trm("append",arg(trm("var",arg(var("V"),eoa)),arg(var("T"),eoa))),arg(var("Stck"),eoa))),eoa)))),arg(trm("rl",arg(trm("scaffix",arg(var("Cc"),arg(var("S"),arg(trm("str",arg(var("F"),arg(var("Fs"),eoa))),arg(trm("lst",arg(var("T"),arg(var("Stck"),eoa))),eoa))))),arg(trm("sclini",arg(var("Cc"),arg(var("S"),arg(trm("lst",arg(trm("append",arg(trm("trm",arg(trm("str",arg(var("F"),arg(var("Fs"),eoa))),arg(trm("eoa",eoa),eoa))),arg(var("T"),eoa))),arg(var("Stck"),eoa))),eoa)))),arg(trm("rl",arg(trm("scaffix",arg(var("Cc"),arg(var("S"),arg(trm("trm",arg(var("F"),arg(var("As"),eoa))),arg(trm("lst",arg(var("T"),arg(var("Stck"),eoa))),eoa))))),arg(trm("sclini",arg(var("Cc"),arg(var("S"),arg(trm("lst",arg(trm("append",arg(trm("trm",arg(var("F"),arg(var("As"),eoa))),arg(var("T"),eoa))),arg(var("Stck"),eoa))),eoa)))),arg(trm("rl",arg(trm("scaffix",arg(var("Cc"),arg(var("S"),arg(var("F"),arg(trm("lst",arg(var("T"),arg(var("Stck"),eoa))),eoa))))),arg(trm("sclini",arg(var("Cc"),arg(var("S"),arg(trm("lst",arg(trm("append",arg(trm("trm",arg(var("F"),arg(trm("eoa",eoa),eoa))),arg(var("T"),eoa))),arg(var("Stck"),eoa))),eoa)))),arg(trm("rl",arg(trm("sclini",arg(trm("rpar",eoa),arg(var("S"),arg(trm("lst",arg(var("T"),arg(var("Stck"),eoa))),eoa)))),arg(trm("sccc",arg(trm("cc",arg(trm("first",arg(var("S"),eoa)),eoa)),arg(trm("first",arg(var("S"),eoa)),arg(trm("rest",arg(var("S"),eoa)),arg(var("T"),arg(var("Stck"),eoa)))))),arg(trm("rl",arg(trm("sclini",arg(var("Cc"),arg(var("S"),arg(var("Stck"),eoa)))),arg(trm("sccc",arg(trm("cc",arg(trm("first",arg(var("S"),eoa)),eoa)),arg(trm("first",arg(var("S"),eoa)),arg(trm("rest",arg(var("S"),eoa)),arg(trm("null",eoa),arg(var("Stck"),eoa)))))),arg(trm("rl",arg(trm("scfinalize",arg(trm("first",arg(trm("eos",eoa),eoa)),arg(trm("rest",arg(trm("eos",eoa),eoa)),arg(trm("trm",arg(var("F"),arg(var("As"),eoa))),arg(trm("eol",eoa),eoa))))),arg(trm("trm",arg(var("F"),arg(var("As"),eoa))),arg(trm("rl",arg(trm("scfinalize",arg(trm("first",arg(trm("eos",eoa),eoa)),arg(trm("rest",arg(trm("eos",eoa),eoa)),arg(var("F"),arg(trm("eol",eoa),eoa))))),arg(trm("trm",arg(var("F"),arg(trm("eoa",eoa),eoa))),arg(trm("rl",arg(trm("scfinalize",arg(trm("first",arg(trm("eos",eoa),eoa)),arg(trm("rest",arg(trm("eos",eoa),eoa)),arg(trm("null",eoa),arg(var("Stck"),eoa))))),arg(trm("sccollrls",arg(trm("eol",eoa),arg(var("Stck"),eoa))),arg(trm("rl",arg(trm("sccollrls",arg(var("Rs"),arg(trm("lst",arg(trm("trm",arg(trm("str",arg(trm(#0x72,eoa),arg(trm("str",arg(trm(#0x6c,eoa),arg(trm("eos",eoa),eoa))),eoa))),arg(trm("arg",arg(var("L"),arg(trm("arg",arg(var("R"),arg(trm("eoa",eoa),eoa))),eoa))),eoa))),arg(var("Stck"),eoa))),eoa))),arg(trm("sccollrls",arg(trm("trm",arg(trm("str",arg(trm(#0x72,eoa),arg(trm("str",arg(trm(#0x6c,eoa),arg(trm("eos",eoa),eoa))),eoa))),arg(trm("arg",arg(var("L"),arg(trm("arg",arg(var("R"),arg(trm("arg",arg(var("Rs"),arg(trm("eoa",eoa),eoa))),eoa))),eoa))),eoa))),arg(var("Stck"),eoa))),arg(trm("rl",arg(trm("sccollrls",arg(var("V"),arg(trm("eol",eoa),eoa))),arg(var("V"),arg(trm("rl",arg(trm("scsym",arg(trm("low",eoa),arg(var("C"),arg(trm("str",arg(var("B"),arg(var("S"),eoa))),arg(var("CC"),arg(var("V"),arg(var("Stck"),eoa))))))),arg(trm("scsym",arg(trm("cc",arg(var("B"),eoa)),arg(var("B"),arg(var("S"),arg(var("CC"),arg(trm("cat",arg(var("C"),arg(var("V"),eoa))),arg(var("Stck"),eoa))))))),arg(trm("rl",arg(trm("scsym",arg(trm("cap",eoa),arg(var("C"),arg(trm("str",arg(var("B"),arg(var("S"),eoa))),arg(var("CC"),arg(var("V"),arg(var("Stck"),eoa))))))),arg(trm("scsym",arg(trm("cc",arg(var("B"),eoa)),arg(var("B"),arg(var("S"),arg(var("CC"),arg(trm("cat",arg(var("C"),arg(var("V"),eoa))),arg(var("Stck"),eoa))))))),arg(trm("rl",arg(trm("scsym",arg(trm("num",eoa),arg(var("C"),arg(trm("str",arg(var("B"),arg(var("S"),eoa))),arg(var("CC"),arg(var("V"),arg(var("Stck"),eoa))))))),arg(trm("scsym",arg(trm("cc",arg(var("B"),eoa)),arg(var("B"),arg(var("S"),arg(var("CC"),arg(trm("cat",arg(var("C"),arg(var("V"),eoa))),arg(var("Stck"),eoa))))))),arg(trm("rl",arg(trm("scsym",arg(var("X"),arg(var("C"),arg(var("S"),arg(trm("low",eoa),arg(var("V"),arg(var("Stck"),eoa))))))),arg(trm("sccc",arg(var("X"),arg(var("C"),arg(var("S"),arg(trm("reverse",arg(var("V"),eoa)),arg(var("Stck"),eoa)))))),arg(trm("rl",arg(trm("scsym",arg(var("X"),arg(var("C"),arg(var("S"),arg(trm("cap",eoa),arg(var("V"),arg(var("Stck"),eoa))))))),arg(trm("sccc",arg(var("X"),arg(var("C"),arg(var("S"),arg(trm("var",arg(trm("reverse",arg(var("V"),eoa)),eoa)),arg(var("Stck"),eoa)))))),arg(trm("rl",arg(trm("scspec",arg(trm(#0x23,eoa),arg(trm("str",arg(trm(#0x30,eoa),arg(trm("str",arg(trm(#0x78,eoa),arg(var("S"),eoa))),eoa))),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("eos",eoa),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scspec",arg(trm(#0x23,eoa),arg(trm("str",arg(trm(#0x30,eoa),arg(var("S"),eoa))),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("str",arg(trm(#0x30,eoa),arg(trm("eos",eoa),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scspec",arg(trm(#0x23,eoa),arg(trm("str",arg(trm(#0x2d,eoa),arg(var("S"),eoa))),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("str",arg(trm(#0x2d,eoa),arg(trm("eos",eoa),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scspec",arg(trm(#0x23,eoa),arg(var("S"),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("eos",eoa),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scspec",arg(trm(rev("72"),eoa),arg(trm("str",arg(var("C"),arg(trm("str",arg(trm(rev("72"),eoa),arg(var("S"),eoa))),eoa))),arg(var("Stck"),eoa)))),arg(trm("sccc",arg(trm("cc",arg(trm("first",arg(var("S"),eoa)),eoa)),arg(trm("first",arg(var("S"),eoa)),arg(trm("rest",arg(var("S"),eoa)),arg(var("C"),arg(var("Stck"),eoa)))))),arg(trm("rl",arg(trm("sccomm",arg(trm("str",arg(trm(rev("A"),eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("sccc",arg(trm("cc",arg(trm("first",arg(var("S"),eoa)),eoa)),arg(trm("first",arg(var("S"),eoa)),arg(trm("rest",arg(var("S"),eoa)),arg(var("V"),arg(var("Stck"),eoa)))))),arg(trm("rl",arg(trm("sccomm",arg(trm("str",arg(var("C"),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("sccomm",arg(var("S"),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scstring",arg(var("C"),arg(trm("str",arg(var("B"),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa))))),arg(trm("scstring",arg(var("B"),arg(var("S"),arg(trm("cat",arg(var("C"),arg(var("V"),eoa))),arg(var("Stck"),eoa))))),arg(trm("rl",arg(trm("scdec",arg(trm("str",arg(trm(#0x30,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("str",arg(trm(#0x30,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scdec",arg(trm("str",arg(trm(#0x31,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("str",arg(trm(#0x31,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scdec",arg(trm("str",arg(trm(#0x32,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("str",arg(trm(#0x32,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scdec",arg(trm("str",arg(trm(#0x33,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("str",arg(trm(#0x33,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scdec",arg(trm("str",arg(trm(#0x34,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("str",arg(trm(#0x34,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scdec",arg(trm("str",arg(trm(#0x35,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("str",arg(trm(#0x35,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scdec",arg(trm("str",arg(trm(#0x36,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("str",arg(trm(#0x36,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scdec",arg(trm("str",arg(trm(#0x37,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("str",arg(trm(#0x37,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scdec",arg(trm("str",arg(trm(#0x38,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("str",arg(trm(#0x38,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scdec",arg(trm("str",arg(trm(#0x39,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("scdec",arg(var("S"),arg(trm("str",arg(trm(#0x39,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("scdec",arg(var("S"),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("sccc",arg(trm("cc",arg(trm("first",arg(var("S"),eoa)),eoa)),arg(trm("first",arg(var("S"),eoa)),arg(trm("rest",arg(var("S"),eoa)),arg(trm("rev",arg(var("V"),eoa)),arg(var("Stck"),eoa)))))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x61,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x41,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x62,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x42,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x63,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x43,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x64,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x44,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x65,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x45,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x66,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x46,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x41,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x41,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x42,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x42,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x43,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x43,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x44,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x44,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x45,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x45,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x46,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x46,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x30,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x30,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x31,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x31,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x32,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x32,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x33,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x33,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x34,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x34,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x35,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x35,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x36,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x36,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x37,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x37,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x38,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x38,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(trm("str",arg(trm(#0x39,eoa),arg(var("S"),eoa))),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("schx",arg(var("S"),arg(trm("str",arg(trm(#0x39,eoa),arg(var("V"),eoa))),arg(var("Stck"),eoa)))),arg(trm("rl",arg(trm("schx",arg(var("S"),arg(var("V"),arg(var("Stck"),eoa)))),arg(trm("sccc",arg(trm("cc",arg(trm("first",arg(var("S"),eoa)),eoa)),arg(trm("first",arg(var("S"),eoa)),arg(trm("rest",arg(var("S"),eoa)),arg(trm("rev",arg(var("V"),eoa)),arg(var("Stck"),eoa)))))),arg(trm("rl",arg(trm("cc",arg(trm(#0x2a,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x26,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x61,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x62,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x63,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x64,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x65,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x66,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x67,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x68,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x69,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x6a,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x6b,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x6c,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x6d,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x6e,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x6f,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x70,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x71,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x72,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x73,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x74,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x75,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x76,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x77,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x78,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x79,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x7a,eoa),eoa)),arg(trm("low",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x40,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x24,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x41,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x42,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x43,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x44,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x45,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x46,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x47,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x48,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x49,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x4a,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x4b,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x4c,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x4d,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x4e,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x4f,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x50,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x51,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x52,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x53,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x54,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x55,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x56,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x57,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x58,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x59,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x5a,eoa),eoa)),arg(trm("cap",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x30,eoa),eoa)),arg(trm("num",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x31,eoa),eoa)),arg(trm("num",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x32,eoa),eoa)),arg(trm("num",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x33,eoa),eoa)),arg(trm("num",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x34,eoa),eoa)),arg(trm("num",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x35,eoa),eoa)),arg(trm("num",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x36,eoa),eoa)),arg(trm("num",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x37,eoa),eoa)),arg(trm("num",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x38,eoa),eoa)),arg(trm("num",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x39,eoa),eoa)),arg(trm("num",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x28,eoa),eoa)),arg(trm("lpar",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x29,eoa),eoa)),arg(trm("rpar",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x2c,eoa),eoa)),arg(trm("sepa",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x3d,eoa),eoa)),arg(trm("equ",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x3b,eoa),eoa)),arg(trm("sepa",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x3a,eoa),eoa)),arg(trm("colon",eoa),arg(trm("rl",arg(trm("cc",arg(trm(rev("72"),eoa),eoa)),arg(trm("spec",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x23,eoa),eoa)),arg(trm("spec",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x21,eoa),eoa)),arg(trm("comm",eoa),arg(trm("rl",arg(trm("cc",arg(trm(#0x22,eoa),eoa)),arg(trm("quot",eoa),arg(trm("rl",arg(trm("cc",arg(trm(rev("02"),eoa),eoa)),arg(trm("ws",eoa),arg(trm("rl",arg(trm("cc",arg(trm(rev("A"),eoa),eoa)),arg(trm("ws",eoa),arg(trm("rl",arg(trm("cc",arg(trm(rev("D"),eoa),eoa)),arg(trm("ws",eoa),arg(trm("rl",arg(trm("cc",arg(trm(rev("9"),eoa),eoa)),arg(trm("ws",eoa),arg(eol,eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa)))),eoa))))
+******************
+testx "$Test" "$Doc" "$Flags"
+#31542 steps
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exit
+
+
+
+
+
+cat <<-'******************' > "DecimalNumbers.trm"
+	dec(#0,X) = X;
+	dec(X,dec(Y,Z)) = dec(addd(X,Y),Z);
+
+	eq(dec(N,M),dec(P,Q)) = eqn(eq(N,P),M,Q);
+
+	addd(#0,X) = X;
+	addd(X,#0) = X;
+	addd(X,dec(Y,Z)) = dec(Y,addd(X,Z));
+	addd(dec(X,Y),Z) = dec(X,addd(Y,Z));
+	addd(B,C) = car(addx(B,addx(C,lst(^2,lst(^3,lst(^4,lst(^5,lst(^6,lst(^7,
+	   lst(^8,lst(^9,lst(dec(#1,#0),lst(dec(#1,#1),lst(dec(#1,^2),lst(dec(#1,^3),
+	   lst(dec(#1,^4),lst(dec(#1,^5),lst(dec(#1,^6),lst(dec(#1,^7),lst(dec(#1,^8),
+	   eol))))))))))))))))))));
+	addx(#1,L) = L;
+	addx(^2,lst(N,L)) = addx(#1,L);
+	addx(^3,lst(N,L)) = addx(^2,L);
+	addx(^4,lst(N,L)) = addx(^3,L);
+	addx(^5,lst(N,L)) = addx(^4,L);
+	addx(^6,lst(N,L)) = addx(^5,L);
+	addx(^7,lst(N,L)) = addx(^6,L);
+	addx(^8,lst(N,L)) = addx(^7,L);
+	addx(^9,lst(N,L)) = addx(^8,L);
+
+	car(lst(D,L)) = D;
+
+	todec(#0) = #0;
+	todec(#1) = #1;
+	todec(bin(N,D)) = addd(twice(todec(N)),D);
+
+	twice(N) = addd(N,N);
+******************
+
+cat <<-'******************' > "UnHex.trm"
+	unhex(#0) = #0;
+	unhex(#1) = #1;
+	unhex(^2) = bin(#1,#0);
+	unhex(^3) = bin(#1,#1);
+	unhex(^4) = bin(bin(#1,#0),#0);
+	unhex(^5) = bin(bin(#1,#0),#1);
+	unhex(^6) = bin(bin(#1,#1),#0);
+	unhex(^7) = bin(bin(#1,#1),#1);
+	unhex(^8) = bin(bin(bin(#1,#0),#0),#0);
+	unhex(^9) = bin(bin(bin(#1,#0),#0),#1);
+	unhex(^a) = bin(bin(bin(#1,#0),#1),#0);
+	unhex(^b) = bin(bin(bin(#1,#0),#1),#1);
+	unhex(^c) = bin(bin(bin(#1,#1),#0),#0);
+	unhex(^d) = bin(bin(bin(#1,#1),#0),#1);
+	unhex(^e) = bin(bin(bin(#1,#1),#1),#0);
+	unhex(^f) = bin(bin(bin(#1,#1),#1),#1);
+
+	unhex(^A) = bin(bin(bin(#1,#0),#1),#0);
+	unhex(^B) = bin(bin(bin(#1,#0),#1),#1);
+	unhex(^C) = bin(bin(bin(#1,#1),#0),#0);
+	unhex(^D) = bin(bin(bin(#1,#1),#0),#1);
+	unhex(^E) = bin(bin(bin(#1,#1),#1),#0);
+	unhex(^F) = bin(bin(bin(#1,#1),#1),#1);
+
+	unhex(str(C,S)) = unhexn(str(C,S),#0);
+
+	unhexn(str(C,S),N)
+	   = unhexn(S,add(mul(bin(bin(bin(bin(#1,#0),#0),#0),#0),N),unhex(C)));
+	unhexn(eos,N) = N;
+******************

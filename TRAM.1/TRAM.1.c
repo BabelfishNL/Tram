@@ -2,12 +2,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define error(...) \
-    fprintf( stdout, "***ERROR***\n"); \
-    fprintf( stdout, __VA_ARGS__); \
-    fprintf( stdout, "\n"); \
-    fflush(stdout); \
-    exit(1);
+#define error(...) {\
+    fprintf( stderr, "***ERROR***\n"); \
+    fprintf( stderr, __VA_ARGS__); \
+    fprintf( stderr, "\n"); \
+    fflush(stderr); \
+    exit(1); \
+}
 
 typedef uint32_t tval; // tagged value
 
@@ -40,7 +41,10 @@ int MEMSIZE=100000; //nodes
 ref mem, usedNodes, freeNodes;
 #define nil mem
 
-int dbg=0;
+int Dbg=0;
+enum DbgSt {DNone,DIO,DGC,DSteps,DStepDump,DCycles};
+//debug levels -- 0: none, 1: I/O, 2: gc, 3: rewr steps, 4:: dump steps, 5:dump cycles
+int Drulei,Drewrcnt=0;
 
 //registers safe from GC
 ref P, S, X;
@@ -68,15 +72,15 @@ void init() {
 
 int gen=0;
 void gc() {
-	if (dbg>0) fprintf( stdout, "GC gen %d: ",gen++);
+	if (Dbg>=DGC) fprintf( stdout, "GC gen %d: ",gen++);
 	ref trail=nil;
 	long cnt = 0;
 
     if (P!=nil) set(MARK,P->nxt);
     if (X!=nil) set(MARK,X->nxt);
 	if (S!=nil) set(MARK,S->nxt);
-	if (T!=0) set(MARK,ref(T)->nxt);
-	if (V!=0) set(MARK,ref(V)->nxt);
+	if (isREF(T)&&T!=0) set(MARK,ref(T)->nxt);
+	if (isREF(V)&&V!=0) set(MARK,ref(V)->nxt);
 
 	for (ref r = usedNodes; r!=nil; ) {
 		if (has(MARK,r->nxt)) {
@@ -107,7 +111,7 @@ void gc() {
 			r = nxt;
 		}
 	}
-	if (dbg) fprintf( stdout, "%ld freed\n",cnt);
+	if (Dbg>=DGC) fprintf( stdout, "%ld freed\n",cnt);
 }
 
 ref new(tval x, tval y) {
@@ -125,8 +129,13 @@ ref new(tval x, tval y) {
     tmp->cdr = y;
     return tmp;
 }
+ref detach(tval x, tval y){
+    ref nd = new(x,y);
+    usedNodes = ref(nd->nxt);
+    return nd;
+}
 
-void pval(tval v);
+void pval(tval v,int nl);
 
 FILE *in;
 int c;
@@ -158,13 +167,22 @@ tval readTerm(char *nm) { // reverse rules
                 v = ref(v)->car;
                 continue;
             case '#': // data (hex or dec)
-                if ((c=fgetc(in))=='0') {
-                    if ((c=fgetc(in))!='x') { error("expected 'x', got %c", c); }
-                    num = 0;
-                    while ((c=fgetc(in))>='0'&&c<='9'||c>='a'&&c<='f'||c>='A'&&c<='F') {
-                        num = 16*num+(c<='9'?c-'0':c<='F'?10+c-'A':10+c-'a');
+                 if ((c=fgetc(in))=='0') {
+                    if ((c=fgetc(in))=='x') {
+                        num = 0;
+                        while ((c = fgetc(in)) >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F') {
+                            num = 16 * num + (c <= '9' ? c - '0' : c <= 'F' ? 10 + c - 'A' : 10 + c - 'a');
+                        }
+                        v = (num << 2) | 1;
+                        continue;
+                    } else if (c>='0'&&c<='9') {
+                        sgn = 1;
+                        num = c-'0';
+                        goto decimal;
+                    } else {
+                            v = 1;
+                            continue;
                     }
-                    v = (num<<2)|1;
                 } else {
                     if (c=='-') {
                         sgn = -1;
@@ -173,19 +191,17 @@ tval readTerm(char *nm) { // reverse rules
                         sgn = 1;
                         num = c-'0';
                     }
+                  decimal:
                     while ((c=fgetc(in))>='0'&&c<='9') {
                         num = 10*num+c-'0';
                     }
                     v = ((sgn*num)<<2)|1;
-
+                    continue;
                 }
-                continue;
             case '\'': //data (char)
                 v = (fgetc(in)<<2)|1;
-                if ((c=fgetc(in))=='\'') {
-                    c=fgetc(in);
-                }
-                continue;
+                if ((c=fgetc(in))!='\'') error("expected ' got character %c (%d)",c,c);
+                break;
             case '*': case '&': // Var
             case 'A': case 'B': case 'C': case 'D': case 'E': case 'F': case 'G':
             case 'H': case 'I': case 'J': case 'K': case 'L': case 'M': case 'N':
@@ -193,7 +209,7 @@ tval readTerm(char *nm) { // reverse rules
             case 'V': case 'W': case 'X': case 'Y': case 'Z':
                 len = 1;
                 num = c=='*'?1:c=='&'?2:c-'A'+3;
-                while ((c=fgetc(in))=='^'||c>='0'&&c<='9'||c>='a'&&c<='z'||c>='A'&&c<='Z') {
+                while ((c=fgetc(in))=='.'||c>='0'&&c<='9'||c>='a'&&c<='z'||c>='A'&&c<='Z') {
                     if (++len<=4) {
                         num = num << 6 | (c == '^' ? 1 : c - (c <= '9' ? '0'-2 : (c <= 'Z' ? 'A'-12 : 'a'-38)));
                     }
@@ -211,7 +227,7 @@ tval readTerm(char *nm) { // reverse rules
             case 'v': case 'w': case 'x': case 'y': case 'z':
                 len = 1;
                 num = c=='@'?1:c=='$'?2:c-'a'+3;
-                while ((c=fgetc(in))=='^'||c>='0'&&c<='9'||c>='a'&&c<='z'||c>='A'&&c<='Z') {
+                while ((c=fgetc(in))=='.'||c>='0'&&c<='9'||c>='a'&&c<='z'||c>='A'&&c<='Z') {
                     if (++len<=5) {
                         num = num << 6 | (c == '^' ? 1 : c - (c <= '9' ? '0'-2 : (c <= 'Z' ? 'A'-12 : 'a'-38)));
                     }
@@ -268,6 +284,8 @@ tval readTerm(char *nm) { // reverse rules
 
 enum states {BURED=1000, BUDONECDR, BUDONEBOTH, TOPRED, FORRULES, MATCH, MATCHDONE, MATCHDONECAR,
     INSTDONECAR, INSTDONEBOTH, BUILD, ALLDONE, INST, INSTCONT, PRINT, PRT, PRINTDONECAR, PRINTDONEBOTH};
+const char * prstates[] = {"BURED", "BUDONECDR", "BUDONEBOTH", "TOPRED", "FORRULES", "MATCH", "MATCHDONE", "MATCHDONECAR",
+    "INSTDONECAR", "INSTDONEBOTH", "BUILD", "ALLDONE", "INST", "INSTCONT"};
 #define asDTA(d)  1+4*d
 #define PopDTA(X) (X->car-1)>>2; X=ref(X->cdr);
 
@@ -282,7 +300,7 @@ char *var0="~*&ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 void qpc(char const c) {
     if (c!='~') fprintf(stdout, "%c",c);
 }
-void pval(tval v) {
+void pval(tval v,int nl) {
     if ((v&1)==0) {//ref
         fprintf(stdout, "\\%d",v);
     } else if ((v&3)==1) {//data
@@ -296,21 +314,41 @@ void pval(tval v) {
         qpc(idc[(v>>26)&63]); qpc(idc[(v>>20)&63]); qpc(idc[(v>>14)&63]); qpc(idc[(v>>8)&63]);
         fprintf(stdout, "%s",((v>>2)&1)?"...":"");
     }
+    if (nl) fprintf(stdout, "\n");
 }
 
+int flats=0;
 void ptrm(tval t) {
     ref ptr;
     X=nil;
+    int instr = 0;
     for(;;) {
         if (isREF(t)) {
             ptr = ref(t);
             if (isFUN(ptr->car)) {
-                pval(ptr->car);
-                if (ptr->cdr!=0) {
-                    fprintf(stdout, "(");
-                    Push(X,(')'<<2)+1);
-                    t = ptr->cdr;
+                if (flats && ptr->car == FSYMstr) {
+                    if (!instr) {
+                        instr = 1;
+                        fprintf(stdout, "\"");
+                    }
+                    fprintf(stdout, "%c", (char)((ref(ref(ptr->cdr)->car)->car) >> 2));
+                    t = ref(ref(ptr->cdr)->cdr)->car;
                     continue;
+                } else if (flats && ptr->car == FSYMeos) {
+                    if (instr) {
+                        instr = 0;
+                        fprintf(stdout, "\"");
+                    } else {
+                        fprintf(stdout, "\"\"");
+                    }
+                } else {
+                    pval(ptr->car,0);
+                    if (ptr->cdr != 0) {
+                        fprintf(stdout, "(");
+                        Push(X, (')' << 2) + 1);
+                        t = ptr->cdr;
+                        continue;
+                    }
                 }
             } else {
                 if (ptr->cdr!=0) {
@@ -321,7 +359,7 @@ void ptrm(tval t) {
                 continue;
             }
         } else {
-            pval(t);
+            pval(t,0);
         }
         while (X!=nil && isNREF(X->car)) {
             t=Pop(X);
@@ -351,7 +389,8 @@ ref reduce (/*tval T, ref P*/) {
     ref p, sub;
     Push(S,asDTA(ALLDONE));
 loop: //full-reduce is BURED
-    switch (state) { // T=term
+    if (Dbg>=DCycles) fprintf(stdout, "%s ",prstates[state-1000]);
+    switch (state) { // T is subject term, V is result
         case BURED: //T is term
             if (isNREF(T)||T==0) {
                 V = T;
@@ -362,13 +401,13 @@ loop: //full-reduce is BURED
             Push(S,asDTA(BUDONECDR));
             T=ref(T)->cdr;
             goto loop;
-        case BUDONECDR: //res is cdr, tos is car-to-do
+        case BUDONECDR: //V is cdr, tos is car-to-do
             T = Pop(S);
             Push(S,V);
             Push(S,asDTA(BUDONEBOTH));
             state = BURED;
             goto loop;
-        case BUDONEBOTH: //(res is car), tos is cdr
+        case BUDONEBOTH: //(V is car), tos is cdr
             if (isREF(V)) {
                 T = Pop(S);
                 V = idx(new(V,T));
@@ -380,15 +419,18 @@ loop: //full-reduce is BURED
             state = TOPRED;
             goto loop;
         case TOPRED: //(f is fun,T = args)
+            if (Dbg>=DStepDump) pval(f,1);
             p = P;
             t = T;
             state = FORRULES;
+            if (Dbg>=DSteps) Drulei=0;
             goto loop;
         case FORRULES: //(f,t,p, T, P)
             if (p==nil) { // eor
                 state = BUILD;
                 goto loop;
             }
+            if (Dbg>=DSteps) Drulei++;
             if (ref(ref(p->car)->car)->car != f) {
                 p=ref(p->cdr);
                 goto loop;
@@ -433,6 +475,8 @@ loop: //full-reduce is BURED
         case MATCHDONE://(sub,p)
             pat = ref(p->car)->cdr; //rhs
             state = INST;
+            if (Dbg>=DSteps) Drewrcnt++;
+            if (Dbg>=DSteps) printf("Rule %d, Steps %d\n",Drulei,Drewrcnt);
             goto loop;
         case INST: //(pat,sub)
             if (isREF(pat)&&pat!=0) {
@@ -453,13 +497,13 @@ loop: //full-reduce is BURED
             V = pat;
             state = PopDTA(S);
             goto loop;
-        case INSTDONECAR: // res is car
+        case INSTDONECAR: // V is car
             pat = Pop(S);
             Push(S,V);
             Push(S,asDTA(INSTDONEBOTH));
             state = INST;
             goto loop;
-        case INSTDONEBOTH: // res is cdr, ToS = car
+        case INSTDONEBOTH: // V is cdr, ToS = car
             t = Pop(S);
             if (isFUN(t)) {
                 f = t;
@@ -473,7 +517,7 @@ loop: //full-reduce is BURED
             V = idx(new(t,V));
             state = PopDTA(S);
             goto loop;
-        case INSTCONT: {// res is car
+        case INSTCONT: {// V is car
             sub = PopRef(S);
             pat = Pop(S);
             state = PopDTA(S);
@@ -506,12 +550,13 @@ int main(int argc, char *argv[]) {
     int i=1;
     tval t;
     char *nm;
+    int fln,fi=0;
 
     if (argc<2) {
         printf(
         "      Note that D and X must appear as 1st and 2nd cli switch when used\n"
         "-D n         generate level n (1..3) debugging info\n"
-        "-X nnn       set memory size to nnn\n"
+        "-X nnn       set memory size to nnn*1000\n"
         "\n"
         "-P <fname>   Load program\n"
         "-p <fname>   Load program segment\n"
@@ -531,8 +576,8 @@ int main(int argc, char *argv[]) {
         "-B <fname> <todo> print result as binary\n"
         );
     }
-    if (i<argc && argv[i][1]=='D') { dbg = argv[++i][0]-'0'; i++; }
-    if (i<argc && argv[i][1]=='X') { sscanf (argv[++i], "%i", &MEMSIZE); MEMSIZE*=1000; i++; }
+    if (i<argc && argv[i][1]=='D') { Dbg = argv[++i][0]-'0'; i++; }
+    if (i<argc && argv[i][1]=='X') { sscanf(argv[++i], "%i", &MEMSIZE); MEMSIZE*=100000; i++; }
 
     init();
 
@@ -561,12 +606,17 @@ int main(int argc, char *argv[]) {
             case 's':   if ((in = fopen(argv[i++], "r"))==NULL) {
                             error("unknown file %s",argv[i++]);
                         };
+                        fseek(in,0,SEEK_END);
+                        fln=ftell(in);
                         V = idx(new(FSYMeos,0));
-                        while ((c = fgetc(in))!=EOF) {
+                        for(fi=1;fi<=fln;fi++) {
+                            fseek(in,-fi,SEEK_END);
+                            c = fgetc(in);
                             V = idx(new(V,0));
                             V = idx(new(idx(new((c<<2)|1,0)),V));
                             V = idx(new(FSYMstr,V));
                         }
+                        fclose(in);
                         T = idx(new(V, T));
                         break;
             case 'b':
@@ -574,16 +624,19 @@ int main(int argc, char *argv[]) {
             case 'I':   pprg(P);
                         printf("\n");
                         break;
-            case 'i':   ptrm(T);
+            case 'i':   if (Dbg>=DIO) flats=1;
+                        ptrm(T);
                         printf("\n");
+                        flats=0;
                         break;
-            case 'r':   if (dbg) printf("\n### Start ###\n");
-                        X = reduce();
-	                    if (dbg) printf("### Done! ###\n");
+            case 'r':   if (Dbg>=DIO) printf("\n### Start ###\n");
+                        X = reduce(); //uses T
+	                    if (Dbg>=DIO) printf("### Done! ###\n");
                         break;
-            case 'O':
+            case 'O':   if (Dbg>=DIO) flats=1;
                         ptrm(idx(X));
                         printf("\n");
+                        flats=0;
                         break;
             default:    error("No such option: %c. Use %s for help.",argv[i-1][1],argv[0]);
         }
