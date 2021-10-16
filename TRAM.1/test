@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [ $# -lt 1 ]; then
     printf "Usage: %s <application>\n" "$0" >&2
@@ -7,7 +7,7 @@ fi
 bin="./$1"           # The application (from command arg)
 diff="diff -iad"   # Diff command, or what ever
 
-function test () {
+test () {
 	echo -n $2  '[' $bin -P "prog$1.trm" -T "term$1.trm" -r -O ']' "=>  "
 	$bin -P "prog$1.trm" -T "term$1.trm" -r -O  > "out$1.out"
 	$diff "out$1.out" "expect$1.out"
@@ -18,7 +18,7 @@ function test () {
             printf "TEST $1 OK!\n"
     fi
 }
-function testx () {
+testx () {
 	echo -n $2 '[' $bin $(echo "$3") ']' "=>  "
 	$bin $(echo "$3") > "out$1.out"
 	$diff "out$1.out" "expect$1.out"
@@ -668,7 +668,7 @@ testx "$Test" "$Doc" "$Flags"
 
 Test=230
 Flags="-D 1 -X 10 -p ScannerParser.trm -p Lists.trm -p Strings.trm -C  -s Strings.trm -M term1$Test.trm -r -O"
-Doc="Scanner Lists module"
+Doc="Scanner scan Strings module"
 cat <<-'******************' > "term1$Test.trm"
 	scan(%1)
 ******************
