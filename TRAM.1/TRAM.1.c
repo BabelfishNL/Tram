@@ -129,18 +129,13 @@ ref new(tval x, tval y) {
     tmp->cdr = y;
     return tmp;
 }
-ref detach(tval x, tval y){
-    ref nd = new(x,y);
-    usedNodes = ref(nd->nxt);
-    return nd;
-}
 
 void pval(tval v,int nl);
 
 FILE *in;
 int c;
 
-tval readTerm(char *nm) { // reverse rules
+tval readTerm(char *nm) {
     tval num, v;
     int sgn, len;
     if ((in = fopen(nm, "r"))==NULL) {
@@ -148,25 +143,13 @@ tval readTerm(char *nm) { // reverse rules
     };
     c = fgetc(in);
     for (;;) {
-        //fprintf( stdout, "%c",c);
-        //fflush(stdout);
         switch (c) {
             case ' ': case '\n': case '\r': case '\t': case '\v': case '\f':
                 break;
             case '!': // comment
                 while ((c=fgetc(in))!='\n') {}
                 break;
-            case '%': // dec (meta-variable)
-                num = 0;
-                while ((c=fgetc(in))>='0'&&c<='9') {
-                    num = 10*num+c-'0';
-                }
-                for (v=T, len=0; v!=0; v=ref(v)->cdr) len++;
-                num = len-num;
-                for (v=T; num--; v=ref(v)->cdr) {}
-                v = ref(v)->car;
-                continue;
-            case '#': // data (hex or dec)
+             case '#': // data (hex or dec)
                  if ((c=fgetc(in))=='0') {
                     if ((c=fgetc(in))=='x') {
                         num = 0;
@@ -202,6 +185,16 @@ tval readTerm(char *nm) { // reverse rules
                 v = (fgetc(in)<<2)|1;
                 if ((c=fgetc(in))!='\'') error("expected ' got character %c (%d)",c,c);
                 break;
+            case '%': // dec (meta-variable)
+                num = 0;
+                while ((c=fgetc(in))>='0'&&c<='9') {
+                    num = 10*num+c-'0';
+                }
+                for (v=T, len=0; v!=0; v=ref(v)->cdr) len++;
+                num = len-num;
+                for (v=T; num--; v=ref(v)->cdr) {}
+                v = ref(v)->car;
+                continue;
             case '*': case '&': // Var
             case 'A': case 'B': case 'C': case 'D': case 'E': case 'F': case 'G':
             case 'H': case 'I': case 'J': case 'K': case 'L': case 'M': case 'N':
@@ -388,152 +381,154 @@ ref reduce (/*tval T, ref P*/) {
     tval f, t, pat;
     ref p, sub;
     Push(S,asDTA(ALLDONE));
-loop: //full-reduce is BURED
-    if (Dbg>=DCycles) fprintf(stdout, "%s ",prstates[state-1000]);
-    switch (state) { // T is subject term, V is result
-        case BURED: //T is term
-            if (isNREF(T)||T==0) {
-                V = T;
-                state = PopDTA(S);
-                goto loop;
-            }
-            Push(S,ref(T)->car);
-            Push(S,asDTA(BUDONECDR));
-            T=ref(T)->cdr;
-            goto loop;
-        case BUDONECDR: //V is cdr, tos is car-to-do
-            T = Pop(S);
-            Push(S,V);
-            Push(S,asDTA(BUDONEBOTH));
-            state = BURED;
-            goto loop;
-        case BUDONEBOTH: //(V is car), tos is cdr
-            if (isREF(V)) {
-                T = Pop(S);
-                V = idx(new(V,T));
-                state = PopDTA(S);
-                goto loop;
-            }
-            f = V;
-            T = Pop(S);
-            state = TOPRED;
-            goto loop;
-        case TOPRED: //(f is fun,T = args)
-            if (Dbg>=DStepDump) pval(f,1);
-            p = P;
-            t = T;
-            state = FORRULES;
-            if (Dbg>=DSteps) Drulei=0;
-            goto loop;
-        case FORRULES: //(f,t,p, T, P)
-            if (p==nil) { // eor
-                state = BUILD;
-                goto loop;
-            }
-            if (Dbg>=DSteps) Drulei++;
-            if (ref(ref(p->car)->car)->car != f) {
-                p=ref(p->cdr);
-                goto loop;
-            }
-            sub = nil;
-            Push(S,asDTA(MATCHDONE));
-            state = MATCH;
-            pat = ref(ref(p->car)->car)->cdr;
-            goto loop;
-        case MATCH: //(t,pat,sub,p, T, P)
-            if (isREF(pat)&&pat!=0) { // compound
-                if (isNREF(t)) goto fail;
-                Push(S,ref(t)->cdr);
-                Push(S,ref(pat)->cdr);
-                Push(S,asDTA(MATCHDONECAR));
-                pat=ref(pat)->car;
-                t=ref(t)->car;
-                goto loop;
-            }
-            if (isVAR(pat)) {
-                sub = new(idx(new(pat,t)),idx(sub));
-                state = PopDTA(S);
-                goto loop;
-            }
-            if (pat==t) {
-                state = PopDTA(S);
-                goto loop;
-            }
-            //fallthrough intended
-        fail:
-            p=ref(p->cdr);
-            t = T;
-            do {state = PopDTA(S);
-            } while(state!=MATCHDONE);
-            state = FORRULES;
-            goto loop;
-        case MATCHDONECAR://(sub,p) tos is pat.cdr, 2nd is trm.cdr
-            pat = Pop(S);
-            t = Pop(S);
-            state = MATCH;
-            goto loop;
-        case MATCHDONE://(sub,p)
-            pat = ref(p->car)->cdr; //rhs
-            state = INST;
-            if (Dbg>=DSteps) Drewrcnt++;
-            if (Dbg>=DSteps) printf("Rule %d, Steps %d\n",Drulei,Drewrcnt);
-            goto loop;
-        case INST: //(pat,sub)
-            if (isREF(pat)&&pat!=0) {
-                Push(S,ref(pat)->cdr);
-                pat=ref(pat)->car;
-                Push(S,asDTA(INSTDONECAR));
-                goto loop;
-            }
-            if (isVAR(pat)) {// use p as tmp in sub
-                p = sub;
-                while (ref(p->car)->car!=pat) {
-                    p = ref(p->cdr);
+    for (;;) {
+        if (Dbg >= DCycles) fprintf(stdout, "%s ", prstates[state - 1000]);
+        switch (state) { // T is subject term, V is result
+            case BURED: //T is term
+                if (isNREF(T) || T == 0) {
+                    V = T;
+                    state = PopDTA(S);
+                    break;
                 }
-                V = ref(p->car)->cdr;
-                state = PopDTA(S);
-                goto loop;
-            }
-            V = pat;
-            state = PopDTA(S);
-            goto loop;
-        case INSTDONECAR: // V is car
-            pat = Pop(S);
-            Push(S,V);
-            Push(S,asDTA(INSTDONEBOTH));
-            state = INST;
-            goto loop;
-        case INSTDONEBOTH: // V is cdr, ToS = car
-            t = Pop(S);
-            if (isFUN(t)) {
-                f = t;
-                T = V;
-                Push(S,pat);
-                Push(S,idx(sub));
-                Push(S,asDTA(INSTCONT));
+                Push(S, ref(T)->car);
+                Push(S, asDTA(BUDONECDR));
+                T = ref(T)->cdr;
+                break;
+            case BUDONECDR: //V is cdr, tos is car-to-do
+                T = Pop(S);
+                Push(S, V);
+                Push(S, asDTA(BUDONEBOTH));
+                state = BURED;
+                break;
+            case BUDONEBOTH: //(V is car), tos is cdr
+                if (isREF(V)) {
+                    T = Pop(S);
+                    V = idx(new(V, T));
+                    state = PopDTA(S);
+                    break;
+                }
+                f = V;
+                T = Pop(S);
                 state = TOPRED;
-                goto loop;
-            }
-            V = idx(new(t,V));
-            state = PopDTA(S);
-            goto loop;
-        case INSTCONT: {// V is car
-            sub = PopRef(S);
-            pat = Pop(S);
-            state = PopDTA(S);
-            goto loop;
-            }
-        case BUILD:
-            V = idx(new(f,T));
-            state = PopDTA(S);
-            goto loop;
-        case ALLDONE: //done
-            //res = Pop(S);
-            if (S!=nil) {
-                error("Stack should be empty!");
-            }
-            return ref(V);
-        default: error("Bad state!");
+                break;
+            case TOPRED: //(f is fun,T = args)
+                if (Dbg >= DStepDump) pval(f, 1);
+                p = P;
+                t = T;
+                state = FORRULES;
+                if (Dbg >= DSteps) Drulei = 0;
+                break;
+            case FORRULES: //(f,t,p, T, P)
+                if (p == nil) { // eor
+                    state = BUILD;
+                    break;
+                }
+                if (Dbg >= DSteps) Drulei++;
+                if (ref(ref(p->car)->car)->car != f) {
+                    p = ref(p->cdr);
+                    break;
+                }
+                sub = nil;
+                Push(S, asDTA(MATCHDONE));
+                state = MATCH;
+                pat = ref(ref(p->car)->car)->cdr;
+                break;
+            case MATCH: //(t,pat,sub,p, T, P)
+                if (isREF(pat) && pat != 0) { // compound
+                    if (isNREF(t)) goto fail;
+                    Push(S, ref(t)->cdr);
+                    Push(S, ref(pat)->cdr);
+                    Push(S, asDTA(MATCHDONECAR));
+                    pat = ref(pat)->car;
+                    t = ref(t)->car;
+                    break;
+                }
+                if (isVAR(pat)) {
+                    sub = new(idx(new(pat, t)), idx(sub));
+                    state = PopDTA(S);
+                    break;
+                }
+                if (pat == t) {
+                    state = PopDTA(S);
+                    break;
+                }
+                //fallthrough intended
+            fail:
+                p = ref(p->cdr);
+                t = T;
+                do {
+                    state = PopDTA(S);
+                } while (state != MATCHDONE);
+                state = FORRULES;
+                break;
+            case MATCHDONECAR://(sub,p) tos is pat.cdr, 2nd is trm.cdr
+                pat = Pop(S);
+                t = Pop(S);
+                state = MATCH;
+                break;
+            case MATCHDONE://(sub,p)
+                pat = ref(p->car)->cdr; //rhs
+                state = INST;
+                if (Dbg >= DSteps) Drewrcnt++;
+                if (Dbg >= DSteps) printf("Rule %d, Steps %d\n", Drulei, Drewrcnt);
+                break;
+            case INST: //(pat,sub)
+                if (isREF(pat) && pat != 0) {
+                    Push(S, ref(pat)->cdr);
+                    pat = ref(pat)->car;
+                    Push(S, asDTA(INSTDONECAR));
+                    break;
+                }
+                if (isVAR(pat)) {// use p as tmp in sub
+                    p = sub;
+                    while (ref(p->car)->car != pat) {
+                        p = ref(p->cdr);
+                    }
+                    V = ref(p->car)->cdr;
+                    state = PopDTA(S);
+                    break;
+                }
+                V = pat;
+                state = PopDTA(S);
+                break;
+            case INSTDONECAR: // V is car
+                pat = Pop(S);
+                Push(S, V);
+                Push(S, asDTA(INSTDONEBOTH));
+                state = INST;
+                break;
+            case INSTDONEBOTH: // V is cdr, ToS = car
+                t = Pop(S);
+                if (isFUN(t)) {
+                    f = t;
+                    T = V;
+                    Push(S, pat);
+                    Push(S, idx(sub));
+                    Push(S, asDTA(INSTCONT));
+                    state = TOPRED;
+                    break;
+                }
+                V = idx(new(t, V));
+                state = PopDTA(S);
+                break;
+            case INSTCONT: {// V is car
+                    sub = PopRef(S);
+                    pat = Pop(S);
+                    state = PopDTA(S);
+                    break;
+                }
+            case BUILD:
+                V = idx(new(f, T));
+                state = PopDTA(S);
+                break;
+            case ALLDONE: //done
+                //res = Pop(S);
+                if (S != nil) {
+                    error("Stack should be empty!");
+                }
+                return ref(V);
+            default: error("Bad state!");
+        }
     }
 }
 
