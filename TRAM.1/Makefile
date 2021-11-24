@@ -6,4 +6,5 @@ clean:
 	rm *.out *.trm
 	
 test: TRAM
+	cp test test.bak # make deletes file on occasion
 	bash ./test TRAM.1
